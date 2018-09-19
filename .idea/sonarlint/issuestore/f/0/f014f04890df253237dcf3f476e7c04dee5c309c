@@ -1,0 +1,15 @@
+
+_squid:S00112š"FDefine and throw a dedicated exception instead of using a generic one.(ö€õ¬
+gsquid:CommentedOutCodeLineO"<This block of commented-out lines of code should be removed.(Ð˜ñÕýÿÿÿÿ
+csquid:CommentedOutCodeLineÚ"<This block of commented-out lines of code should be removed.(¦í·ý
+msquid:S1450u"VRemove the "oldTime" field and declare it as a local variable in the relevant methods.(“žŠŽ
+Csquid:S1168°"+Return an empty collection instead of null.(¥¹ï
+csquid:CommentedOutCodeLine­"<This block of commented-out lines of code should be removed.(¬úž±
+Zsquid:HiddenFieldCheck´"7Rename "ts" which hides the field declared at line 117.(½†äˆ
+=squid:S1659u"&Declare "duration" on a separate line.(“žŠŽ
+gsquid:CommentedOutCodeLineG"<This block of commented-out lines of code should be removed.(çÒÎ´ùÿÿÿÿ
+^squid:HiddenFieldCheck³";Rename "header" which hides the field declared at line 116.(ü›Ÿ
+7squid:S1659u" Declare "ts" on a separate line.(“žŠŽ
+jsquid:S3776î"RRefactor this method to reduce its Cognitive Complexity from 23 to the 15 allowed.(º­¹›
+gsquid:CommentedOutCodeLine?"<This block of commented-out lines of code should be removed.(ÃÙ³™ýÿÿÿÿ
+@squid:S1148‘"#Use a logger to log this exception.(€ÉÔ…ýÿÿÿÿ

@@ -1,0 +1,3 @@
+
+?squid:S1148P"#Use a logger to log this exception.(€ÉÔ…ýÿÿÿÿ
+³%squid:RedundantThrowsDeclarationCheck "vRemove the declaration of thrown exception 'java.net.SocketException', as it cannot be thrown from constructor's body.(ÿåÕ´ýÿÿÿÿ8³¦ö»Ü,

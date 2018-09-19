@@ -1,0 +1,30 @@
+
+hsquid:CommentedOutCodeLineî"<This block of commented-out lines of code should be removed.(æ©Æšûÿÿÿÿ
+hsquid:CommentedOutCodeLine¼"<This block of commented-out lines of code should be removed.(¾ß—²ùÿÿÿÿ
+hsquid:CommentedOutCodeLine„"<This block of commented-out lines of code should be removed.(ÿÖ¼ôÿÿÿÿÿ
+csquid:CommentedOutCodeLineŞ"<This block of commented-out lines of code should be removed.(ÿ»³ß
+@squid:S1148¢"#Use a logger to log this exception.(€ÉÔ…ıÿÿÿÿ
+csquid:CommentedOutCodeLineÖ"<This block of commented-out lines of code should be removed.(¼Ÿ™Ô
+bsquid:CommentedOutCodeLine4"<This block of commented-out lines of code should be removed.(«¡ú—
+Psquid:S1197œ"8Move the array designator from the variable to the type.(œë¨‡
+gsquid:CommentedOutCodeLineF"<This block of commented-out lines of code should be removed.(“üåşÿÿÿÿ
+gsquid:CommentedOutCodeLinep"<This block of commented-out lines of code should be removed.(õØÛğşÿÿÿÿ
+‡"squid:ClassVariableVisibilityCheckş"SMake content a static final constant or non-public and provide accessors if needed.(†Š§‰ûÿÿÿÿ
+hsquid:CommentedOutCodeLineâ"<This block of commented-out lines of code should be removed.(®Ä¡ïúÿÿÿÿ
+gsquid:CommentedOutCodeLine"<This block of commented-out lines of code should be removed.(ùÇ ïøÿÿÿÿ
+dsquid:S00112¦"FDefine and throw a dedicated exception instead of using a generic one.(œò€ùÿÿÿÿ
+=squid:S3398Z"Move this method into "Client".(­÷²Ã8†Æò¡Ø,
+ƒ"squid:ClassVariableVisibilityCheckû"OMake seq a static final constant or non-public and provide accessors if needed.(ÏÑ©¥øÿÿÿÿ
+®%squid:RedundantThrowsDeclarationCheck)"vRemove the declaration of thrown exception 'java.net.SocketException', as it cannot be thrown from constructor's body.(ÙÑˆú8†Æò¡Ø,
+osquid:S3776É"RRefactor this method to reduce its Cognitive Complexity from 29 to the 15 allowed.(—ıì„øÿÿÿÿ
+bsquid:CommentedOutCodeLinej"<This block of commented-out lines of code should be removed.(Ü”’õ
+@squid:S1148†"#Use a logger to log this exception.(€ÉÔ…ıÿÿÿÿ
+Xsquid:UnusedPrivateMethod"2Remove this unused private "onReceiveData" method.(­”¹í
+>squid:S1659"&Declare "rtcpPort" on a separate line.(Ã‚‘û
+bsquid:CommentedOutCodeLine&"<This block of commented-out lines of code should be removed.(¥Æô¨
+hsquid:CommentedOutCodeLineÚ"<This block of commented-out lines of code should be removed.(°¹ğÜûÿÿÿÿ
+"squid:ClassVariableVisibilityCheckü"RMake method a static final constant or non-public and provide accessors if needed.(ç¢¬¦
+Usquid:S1155\">Use isEmpty() to check whether the collection is empty or not.(”À’æ
+~"squid:ClassVariableVisibilityCheckı"OMake uri a static final constant or non-public and provide accessors if needed.(ñê†Å
+@squid:S1148•"#Use a logger to log this exception.(€ÉÔ…ıÿÿÿÿ
+bsquid:CommentedOutCodeLine,"<This block of commented-out lines of code should be removed.(¥Æô¨

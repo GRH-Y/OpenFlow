@@ -1,0 +1,110 @@
+
+‡"squid:ClassVariableVisibilityCheckû"SMake cttsBox a static final constant or non-public and provide accessors if needed.(¼Ò“âúÿÿÿÿ
+„"squid:ClassVariableVisibilityCheck¯"PMake name a static final constant or non-public and provide accessors if needed.(“¤ÙØøÿÿÿÿ
+™squid:S1186¨"€Add a nested comment explaining why this method is empty, throw an UnsupportedOperationException or complete the implementation.(š’á¡
+Œ"squid:ClassVariableVisibilityCheck"XMake creationTime a static final constant or non-public and provide accessors if needed.(ÊüŒşıÿÿÿÿ
+ksquid:ModifiersOrderCheckø"EReorder the modifiers to comply with the Java Language Specification.(µéÖ
+‚"squid:ClassVariableVisibilityCheck©"SMake avcCBox a static final constant or non-public and provide accessors if needed.(°Ğ³Á
+™squid:S1186"€Add a nested comment explaining why this method is empty, throw an UnsupportedOperationException or complete the implementation.(š’á¡
+‰"squid:ClassVariableVisibilityCheck "UMake timeScale a static final constant or non-public and provide accessors if needed.(¡—£÷ıÿÿÿÿ
+‚"squid:ClassVariableVisibilityCheck‡"SMake mdhdBox a static final constant or non-public and provide accessors if needed.(õ÷ï
+‚"squid:ClassVariableVisibilityCheckı"SMake stscBox a static final constant or non-public and provide accessors if needed.(ª î
+‡"squid:ClassVariableVisibilityCheckü"SMake stssBox a static final constant or non-public and provide accessors if needed.(ëäÊ™úÿÿÿÿ
+psquid:ModifiersOrderCheckÏ"EReorder the modifiers to comply with the Java Language Specification.(ÎÎä©øÿÿÿÿ
+™squid:S1186†"€Add a nested comment explaining why this method is empty, throw an UnsupportedOperationException or complete the implementation.(š’á¡
+™squid:S1186â"€Add a nested comment explaining why this method is empty, throw an UnsupportedOperationException or complete the implementation.(š’á¡
+‚"squid:ClassVariableVisibilityCheckÈ"SMake srcData a static final constant or non-public and provide accessors if needed.(ç¬Ì“
+‚"squid:ClassVariableVisibilityCheck»"SMake mdiaBox a static final constant or non-public and provide accessors if needed.(ú€º‹
+"squid:ClassVariableVisibilityCheckˆ"SMake hdlrBox a static final constant or non-public and provide accessors if needed.(üŸÊ(
+†"squid:ClassVariableVisibilityCheck®"WMake handlerType a static final constant or non-public and provide accessors if needed.(ş©ÍÕ
+"squid:ClassVariableVisibilityCheckÜ"PMake mdia a static final constant or non-public and provide accessors if needed.(„Ø»ç
+Š"squid:ClassVariableVisibilityCheckİ"VMake majorBrand a static final constant or non-public and provide accessors if needed.(§û›íüÿÿÿÿ
+ksquid:ModifiersOrderCheckÃ"EReorder the modifiers to comply with the Java Language Specification.(†ÒŠ‚
+‰"squid:ClassVariableVisibilityCheckø"[Make segmentDuration a static final constant or non-public and provide accessors if needed.(ùËÜq
+„"squid:ClassVariableVisibilityCheckŸ"UMake timeScale a static final constant or non-public and provide accessors if needed.(®‰²Ğ
+‚"squid:ClassVariableVisibilityCheck¹"SMake tkhdBox a static final constant or non-public and provide accessors if needed.(ÃÅÔ÷
+„"squid:ClassVariableVisibilityCheckÛ"PMake edts a static final constant or non-public and provide accessors if needed.(Îäûƒşÿÿÿÿ
+‚"squid:ClassVariableVisibilityCheck¾"SMake stblBox a static final constant or non-public and provide accessors if needed.(Àá˜±
+ˆ"squid:ClassVariableVisibilityCheckÖ"YMake altemateGroup a static final constant or non-public and provide accessors if needed.(âÿÃÆ
+psquid:ModifiersOrderCheckÜ"EReorder the modifiers to comply with the Java Language Specification.(‘–…®ıÿÿÿÿ
+ksquid:ModifiersOrderCheck¨"EReorder the modifiers to comply with the Java Language Specification.(Åˆš
+Œ"squid:ClassVariableVisibilityCheckŞ"XMake minorVersion a static final constant or non-public and provide accessors if needed.(—éïÎùÿÿÿÿ
+™squid:S1186ó"€Add a nested comment explaining why this method is empty, throw an UnsupportedOperationException or complete the implementation.(š’á¡
+„"squid:ClassVariableVisibilityCheck£"PMake rate a static final constant or non-public and provide accessors if needed.(’¨“şÿÿÿÿ
+jsquid:ModifiersOrderCheckë"EReorder the modifiers to comply with the Java Language Specification.(çğøp
+ksquid:ModifiersOrderCheckœ"EReorder the modifiers to comply with the Java Language Specification.(Ãìïó
+psquid:ModifiersOrderCheckç"EReorder the modifiers to comply with the Java Language Specification.(†ò—Ôøÿÿÿÿ
+ƒ"squid:ClassVariableVisibilityCheckú"UMake mediaRate a static final constant or non-public and provide accessors if needed.(ÈŒÑ
+nsquid:S3776v"RRefactor this method to reduce its Cognitive Complexity from 41 to the 15 allowed.(ö€áæÿÿÿÿÿ
+csquid:CommentedOutCodeLine‘"<This block of commented-out lines of code should be removed.(ÔÒ¾ì
+@squid:S1148Á"#Use a logger to log this exception.(€ÉÔ…ıÿÿÿÿ
+™squid:S1186ˆ"€Add a nested comment explaining why this method is empty, throw an UnsupportedOperationException or complete the implementation.(š’á¡
+_squid:S00112Ò"FDefine and throw a dedicated exception instead of using a generic one.(€ŸãÈ
+ƒ"squid:ClassVariableVisibilityCheck¡"TMake duration a static final constant or non-public and provide accessors if needed.(Š°Œ¬
+Š"squid:ClassVariableVisibilityCheck¢"VMake durationMs a static final constant or non-public and provide accessors if needed.(Î‰û½şÿÿÿÿ
+‡"squid:ClassVariableVisibilityCheckÓ"SMake trackId a static final constant or non-public and provide accessors if needed.(àíšıÿÿÿÿ
+™squid:S1186Ö"€Add a nested comment explaining why this method is empty, throw an UnsupportedOperationException or complete the implementation.(š’á¡
+…"squid:ClassVariableVisibilityCheckØ"QMake width a static final constant or non-public and provide accessors if needed.(ıæ»úÿÿÿÿ
+™squid:S1186¾"€Add a nested comment explaining why this method is empty, throw an UnsupportedOperationException or complete the implementation.(š’á¡
+™squid:S1186î"€Add a nested comment explaining why this method is empty, throw an UnsupportedOperationException or complete the implementation.(š’á¡
+csquid:CommentedOutCodeLineÆ"<This block of commented-out lines of code should be removed.(«èİ
+ksquid:ModifiersOrderCheck†"EReorder the modifiers to comply with the Java Language Specification.(Ûıä‚
+ksquid:ModifiersOrderCheck¸"EReorder the modifiers to comply with the Java Language Specification.(ïç«õ
+‡"squid:ClassVariableVisibilityCheckº"SMake edtsBox a static final constant or non-public and provide accessors if needed.(é÷ƒœÿÿÿÿÿ
+‡"squid:ClassVariableVisibilityCheckú"SMake sttsBox a static final constant or non-public and provide accessors if needed.(íŸ•ƒÿÿÿÿÿ
+„"squid:ClassVariableVisibilityCheckù"UMake mediaTime a static final constant or non-public and provide accessors if needed.(ÇÄ”Î
+‡"squid:ClassVariableVisibilityCheck¼"SMake isMovie a static final constant or non-public and provide accessors if needed.(›¢ô…ıÿÿÿÿ
+"squid:ClassVariableVisibilityCheck¤"RMake volume a static final constant or non-public and provide accessors if needed.(²ÿ¿à
+"squid:ClassVariableVisibilityCheck"\Make modificationTime a static final constant or non-public and provide accessors if needed.(Öí™½üÿÿÿÿ
+‡"squid:ClassVariableVisibilityCheck¼"SMake vmhdBox a static final constant or non-public and provide accessors if needed.(üÔÅŸùÿÿÿÿ
+™squid:S1186×"€Add a nested comment explaining why this method is empty, throw an UnsupportedOperationException or complete the implementation.(š’á¡
+ksquid:ModifiersOrderCheckÜ"EReorder the modifiers to comply with the Java Language Specification.(ÿœßî
+‹"squid:ClassVariableVisibilityCheckß"\Make compatibleBrands a static final constant or non-public and provide accessors if needed.(âäúĞ
+csquid:CommentedOutCodeLine±"<This block of commented-out lines of code should be removed.(Ïí—½
+‚"squid:ClassVariableVisibilityCheckş"SMake stszBox a static final constant or non-public and provide accessors if needed.(Àˆ¥
+<squid:S3398;" Move this method into "MvhdBox".(Ó‚§øÿÿÿÿ
+jsquid:ModifiersOrderCheckó"EReorder the modifiers to comply with the Java Language Specification.(À¢³J
+‡"squid:ClassVariableVisibilityCheck½"SMake dinfBox a static final constant or non-public and provide accessors if needed.(Ç­Íñúÿÿÿÿ
+…"squid:ClassVariableVisibilityCheckÕ"QMake layer a static final constant or non-public and provide accessors if needed.(¼ê…İúÿÿÿÿ
+hsquid:CommentedOutCodeLine‡"<This block of commented-out lines of code should be removed.(‹–ß«üÿÿÿÿ
+‚"squid:ClassVariableVisibilityCheckš"SMake avc1Box a static final constant or non-public and provide accessors if needed.(ÄƒÜÎ
+ˆ"squid:ClassVariableVisibilityCheckÔ"TMake duration a static final constant or non-public and provide accessors if needed.(í–€œıÿÿÿÿ
+‚"squid:ClassVariableVisibilityCheckİ"SMake drefBox a static final constant or non-public and provide accessors if needed.(Êõö
+ksquid:ModifiersOrderCheck™"EReorder the modifiers to comply with the Java Language Specification.(İÆæõ
+†"squid:ClassVariableVisibilityCheckÙ"RMake height a static final constant or non-public and provide accessors if needed.(ÏÖÓ˜üÿÿÿÿ
+psquid:ModifiersOrderCheckê"EReorder the modifiers to comply with the Java Language Specification.(û¦Ìüÿÿÿÿ
+jsquid:ModifiersOrderCheckÿ"EReorder the modifiers to comply with the Java Language Specification.(«Ûê^
+psquid:ModifiersOrderCheckı"EReorder the modifiers to comply with the Java Language Specification.(ì¿õƒÿÿÿÿÿ
+ksquid:ModifiersOrderCheck"EReorder the modifiers to comply with the Java Language Specification.(³ ñ
+"squid:ClassVariableVisibilityCheck×"RMake volume a static final constant or non-public and provide accessors if needed.(²ÿ¿à
+‚"squid:ClassVariableVisibilityCheckù"SMake stsdBox a static final constant or non-public and provide accessors if needed.(È™³
+ksquid:ModifiersOrderCheckÎ"EReorder the modifiers to comply with the Java Language Specification.(µğóĞ
+…"squid:ClassVariableVisibilityCheckĞ"QMake flags a static final constant or non-public and provide accessors if needed.(áüÙÑÿÿÿÿÿ
+Œ"squid:ClassVariableVisibilityCheckÑ"XMake creationTime a static final constant or non-public and provide accessors if needed.(ÊüŒşıÿÿÿÿ
+‰"squid:ClassVariableVisibilityCheckş"UMake trakBoxes a static final constant or non-public and provide accessors if needed.(ÕÇ½Îıÿÿÿÿ
+‚"squid:ClassVariableVisibilityCheckë"SMake elstBox a static final constant or non-public and provide accessors if needed.(ÿïÁ
+psquid:ModifiersOrderCheck·"EReorder the modifiers to comply with the Java Language Specification.(»¹¾¡ÿÿÿÿÿ
+ksquid:ModifiersOrderCheckÛ"EReorder the modifiers to comply with the Java Language Specification.(Ş§Íé
+ksquid:ModifiersOrderCheck÷"EReorder the modifiers to comply with the Java Language Specification.(‘…øÂ
+hsquid:CommentedOutCodeLineå"<This block of commented-out lines of code should be removed.(¬”´Ìüÿÿÿÿ
+ˆ"squid:ClassVariableVisibilityCheck¡"TMake language a static final constant or non-public and provide accessors if needed.(›ÕÆÃşÿÿÿÿ
+Œ"squid:ClassVariableVisibilityCheck"XMake creationTime a static final constant or non-public and provide accessors if needed.(ÊüŒşıÿÿÿÿ
+psquid:ModifiersOrderCheckĞ"EReorder the modifiers to comply with the Java Language Specification.(ƒíÊ¬ıÿÿÿÿ
+™squid:S1186¶"€Add a nested comment explaining why this method is empty, throw an UnsupportedOperationException or complete the implementation.(š’á¡
+‡"squid:ClassVariableVisibilityCheck‰"SMake minfBox a static final constant or non-public and provide accessors if needed.(¥˜¾Èüÿÿÿÿ
+ksquid:ModifiersOrderCheck­"EReorder the modifiers to comply with the Java Language Specification.(¼éÊş
+‡"squid:ClassVariableVisibilityCheckÿ"SMake mvhdBox a static final constant or non-public and provide accessors if needed.(÷Ëøªûÿÿÿÿ
+hsquid:CommentedOutCodeLineÄ"<This block of commented-out lines of code should be removed.(¯¼Ûåøÿÿÿÿ
+"squid:ClassVariableVisibilityCheckŸ"\Make modificationTime a static final constant or non-public and provide accessors if needed.(Öí™½üÿÿÿÿ
+3squid:S3398M"Move this method into "Box".(º†¸
+‚"squid:ClassVariableVisibilityCheckÿ"SMake stcoBox a static final constant or non-public and provide accessors if needed.(‹îœ
+"squid:ClassVariableVisibilityCheckÒ"\Make modificationTime a static final constant or non-public and provide accessors if needed.(Öí™½üÿÿÿÿ
+™squid:S1186ú"€Add a nested comment explaining why this method is empty, throw an UnsupportedOperationException or complete the implementation.(š’á¡
+ˆ"squid:ClassVariableVisibilityCheck "TMake duration a static final constant or non-public and provide accessors if needed.(í–€œıÿÿÿÿ
+psquid:ModifiersOrderCheck»"EReorder the modifiers to comply with the Java Language Specification.(¤·×ûÿÿÿÿ
+™squid:S1186ò"€Add a nested comment explaining why this method is empty, throw an UnsupportedOperationException or complete the implementation.(š’á¡
+†"squid:ClassVariableVisibilityCheck¥"WMake nextTrackId a static final constant or non-public and provide accessors if needed.(Çïß¡
+<squid:S3398D" Move this method into "MvhdBox".(¿ÇŠ†ùÿÿÿÿ
+™squid:S1186Ê"€Add a nested comment explaining why this method is empty, throw an UnsupportedOperationException or complete the implementation.(š’á¡
+ˆ"squid:ClassVariableVisibilityCheckì"TMake location a static final constant or non-public and provide accessors if needed.(–šŸÄùÿÿÿÿ
+csquid:CommentedOutCodeLine¢"<This block of commented-out lines of code should be removed.(òíøÆ

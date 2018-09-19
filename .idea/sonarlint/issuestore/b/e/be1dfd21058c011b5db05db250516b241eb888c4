@@ -1,0 +1,9 @@
+
+ssquid:S1192‹"VDefine a constant instead of duplicating this literal "Content-Length: 0\r\n" 7 times.(Õ«‚áüÿÿÿÿ
+asquid:S1192 "JDefine a constant instead of duplicating this literal "Session: " 6 times.(ç‚éÜ
+`squid:S1192«"IDefine a constant instead of duplicating this literal "\r\n\r\n" 3 times.(€ÇòF
+_squid:S1192"HDefine a constant instead of duplicating this literal "CSeq: " 14 times.(£Åá×
+hsquid:S3008"RRename this field "Session" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(†±¤m
+Csquid:S1444"-Make this "public static Session" field final(†±¤m
+csquid:CommentedOutCodeLineü"<This block of commented-out lines of code should be removed.(†°ú¼
+€"squid:ClassVariableVisibilityCheck"SMake Session a static final constant or non-public and provide accessors if needed.(†±¤m

@@ -1,0 +1,17 @@
+
+?squid:S1148o"#Use a logger to log this exception.(€ÉÔ…ýÿÿÿÿ
+asquid:CommentedOutCodeLine8"<This block of commented-out lines of code should be removed.(ÑÔÿs
+gsquid:CommentedOutCodeLine="<This block of commented-out lines of code should be removed.(‘ÜÝ‡üÿÿÿÿ
+msquid:S1450("VRemove the "oldTime" field and declare it as a local variable in the relevant methods.(“žŠŽ
+=squid:S1659("&Declare "duration" on a separate line.(“žŠŽ
+7squid:S1659(" Declare "ts" on a separate line.(“žŠŽ
+Csquid:S1659*"'Declare "maxLength" on a separate line.(´õ‰œûÿÿÿÿ
+gsquid:CommentedOutCodeLineB"<This block of commented-out lines of code should be removed.(»ô…¿üÿÿÿÿ
+isquid:CommentedOutCodeLine„"<This block of commented-out lines of code should be removed.(ÚíŒ 8û‡£³Ü,
+^squid:S00112J"FDefine and throw a dedicated exception instead of using a generic one.(ö€õ¬
+@squid:S1148—"#Use a logger to log this exception.(€ÉÔ…ýÿÿÿÿ
+isquid:S3776t"RRefactor this method to reduce its Cognitive Complexity from 27 to the 15 allowed.(º­¹›
+@squid:S1148¢"#Use a logger to log this exception.(€ÉÔ…ýÿÿÿÿ
+osquid:S1450*"SRemove the "type" field and declare it as a local variable in the relevant methods.(´õ‰œûÿÿÿÿ
+hsquid:CommentedOutCodeLine"<This block of commented-out lines of code should be removed.(ÉŒ©Öüÿÿÿÿ
+osquid:S3776©"RRefactor this method to reduce its Cognitive Complexity from 27 to the 15 allowed.(ñîõ‘ýÿÿÿÿ

@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="CurrencyNetConnect">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/libs/CurrencyNetConnect.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

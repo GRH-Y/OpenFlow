@@ -1,0 +1,23 @@
+
+?squid:S1148["#Use a logger to log this exception.(€ÉÔ…ıÿÿÿÿ
+gsquid:CommentedOutCodeLineg"<This block of commented-out lines of code should be removed.(›°¼æúÿÿÿÿ
+csquid:CommentedOutCodeLine†"<This block of commented-out lines of code should be removed.(×õä¢
+gsquid:CommentedOutCodeLineU"<This block of commented-out lines of code should be removed.(éØ»Úûÿÿÿÿ
+Zsquid:S1155C">Use isEmpty() to check whether the collection is empty or not.(£ÿÑŒøÿÿÿÿ
+Zsquid:S11552">Use isEmpty() to check whether the collection is empty or not.(£ÿÑŒøÿÿÿÿ
+\squid:UnusedPrivateMethod“"1Remove this unused private "onAudioVideo" method.(Â‹¹ÿÿÿÿÿ
+gsquid:CommentedOutCodeLine|"<This block of commented-out lines of code should be removed.(‰Áı‹ıÿÿÿÿ
+Dsquid:ObjectFinalizeCheck+"Remove this call to finalize().(±½ïÔ
+gsquid:CommentedOutCodeLinen"<This block of commented-out lines of code should be removed.(÷ùœüÿÿÿÿ
+Xsquid:S1075X"ARefactor your code to get this URI from a customizable parameter.(ÅáŠÿ
+gsquid:CommentedOutCodeLine:"<This block of commented-out lines of code should be removed.(è¹ïşÿÿÿÿ
+Usquid:S1155J">Use isEmpty() to check whether the collection is empty or not.(¦Ÿ¾‰
+[squid:S1155”">Use isEmpty() to check whether the collection is empty or not.(Ö÷—ğúÿÿÿÿ
+Usquid:S11559">Use isEmpty() to check whether the collection is empty or not.(¦Ÿ¾‰
+[squid:S1155”">Use isEmpty() to check whether the collection is empty or not.(Ö÷—ğúÿÿÿÿ
+osquid:S3776“"RRefactor this method to reduce its Cognitive Complexity from 23 to the 15 allowed.(Â‹¹ÿÿÿÿÿ
+Xsquid:S1075b"ARefactor your code to get this URI from a customizable parameter.(íïİ­
+bsquid:CommentedOutCodeLineK"<This block of commented-out lines of code should be removed.(ŠÂÀ
+hsquid:CommentedOutCodeLine"<This block of commented-out lines of code should be removed.(Ò§ÈÍÿÿÿÿÿ
+:squid:S1148-"#Use a logger to log this exception.(Óùóÿ
+gsquid:CommentedOutCodeLineQ"<This block of commented-out lines of code should be removed.(ØŸ‡Ÿøÿÿÿÿ
