@@ -1,7 +1,7 @@
 package server.avedcoder.camera;
 
 
-import util.Logcat;
+import util.LogDog;
 
 /**
  * Created by dell on 11/13/2017.
@@ -22,7 +22,7 @@ public class H264Preview {
         } catch (Throwable e) {
             isInit = false;
             e.printStackTrace();
-            Logcat.e("==> H264Preview loadLibrary libPreviewH264.so error!");
+            LogDog.e("==> H264Preview loadLibrary libPreviewH264.so error!");
         }
     }
 

@@ -8,13 +8,13 @@ import server.avedcoder.packet.RtpPacket;
 import task.executor.BaseConsumerTask;
 import task.executor.ConsumerQueueAttribute;
 import task.executor.TaskContainer;
-import task.executor.interfaces.IConsumerAttribute;
-import task.executor.interfaces.IConsumerTaskExecutor;
-import task.executor.interfaces.ILoopTaskExecutor;
+import task.executor.joggle.IConsumerAttribute;
+import task.executor.joggle.IConsumerTaskExecutor;
+import task.executor.joggle.ILoopTaskExecutor;
 import task.message.MessageCourier;
 import task.message.MessageEnvelope;
-import task.message.interfaces.IMsgPostOffice;
-import util.Logcat;
+import task.message.joggle.IMsgPostOffice;
+import util.LogDog;
 import util.MultiplexCache;
 
 import java.lang.reflect.Constructor;
@@ -49,7 +49,7 @@ public class DVRH264Stream {
     }
 
     public void setMsgPostOffice(IMsgPostOffice postOffice) {
-        messageCourier.setEnvelopeServer(postOffice);
+        messageCourier.addEnvelopeServer(postOffice);
     }
 
 
@@ -131,7 +131,7 @@ public class DVRH264Stream {
 
         @Override
         protected void onInitTask() {
-            Logcat.w("--> DVR H264Stream start ing ....");
+            LogDog.w("--> DVR H264Stream start ing ....");
             //初始化摄像头
             ts = 0;
             boolean isOpen = H264Preview.openCamera(width, height, pixelFormat);
@@ -146,7 +146,7 @@ public class DVRH264Stream {
                     stopEncode();
                 }
             } else {
-                Logcat.e("--> DVR H264Stream open error !");
+                LogDog.e("--> DVR H264Stream open error !");
                 stopEncode();
             }
         }
@@ -191,7 +191,7 @@ public class DVRH264Stream {
                 data[RtpPacket.RTP_HEADER_LENGTH] = header[4];
                 skipLength--;
                 System.arraycopy(nal, skipLength, data, RtpPacket.RTP_HEADER_LENGTH + 1, nal.length - skipLength);
-                Logcat.i("==> single rtp = " + byteToHexStr(data));
+                LogDog.i("==> single rtp = " + byteToHexStr(data));
                 contentPacket.setFullNal(true);
                 contentPacket.setLimit(nal.length - skipLength + RtpPacket.RTP_HEADER_LENGTH);
                 if (trigger) {
@@ -215,7 +215,7 @@ public class DVRH264Stream {
 
                     int len = nal.length - skipLength > maxLength ? maxLength : nal.length - skipLength;
                     System.arraycopy(nal, skipLength, data, RtpPacket.RTP_HEADER_LENGTH + 2, len);
-//                    Logcat.i("==> key rtp = " + Utils.bytes2HexString(data));
+//                    LogDog.i("==> key rtp = " + Utils.bytes2HexString(data));
                     skipLength += len;
                     // Last parameterSetPacket before next NAL
                     if (nal.length == skipLength) {
@@ -271,7 +271,7 @@ public class DVRH264Stream {
                 data[RtpPacket.RTP_HEADER_LENGTH] = header[4];
                 skipLength--;
                 System.arraycopy(nal, skipLength, data, RtpPacket.RTP_HEADER_LENGTH + 1, nal.length - skipLength);
-                Logcat.i("==> single rtp = " + byteToHexStr(data));
+                LogDog.i("==> single rtp = " + byteToHexStr(data));
                 contentPacket.setFullNal(true);
                 contentPacket.setLimit(nal.length - skipLength + RtpPacket.RTP_HEADER_LENGTH);
                 if (trigger) {
@@ -298,7 +298,7 @@ public class DVRH264Stream {
 
                     int len = nal.length - skipLength > maxLength ? maxLength : nal.length - skipLength;
                     System.arraycopy(nal, skipLength, data, RtpPacket.RTP_HEADER_LENGTH + 2, len);
-//                    Logcat.i("==> long rtp = " + Utils.bytes2HexString(data));
+//                    LogDog.i("==> long rtp = " + Utils.bytes2HexString(data));
                     skipLength += len;
                     // Last parameterSetPacket before next NAL
                     if (nal.length == skipLength) {
@@ -332,7 +332,7 @@ public class DVRH264Stream {
 
         @Override
         protected void onDestroyTask() {
-            Logcat.w("--> DVR H264Stream  stop ing ....");
+            LogDog.w("--> DVR H264Stream  stop ing ....");
             if (contentPacketCache != null) {
                 contentPacketCache.release();
             }

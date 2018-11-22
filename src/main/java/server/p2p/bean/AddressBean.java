@@ -1,8 +1,8 @@
 package server.p2p.bean;
 
 public class AddressBean {
-    String ip;
-    int port;
+    private String ip;
+    private int port;
 
     public String getIp() {
         return ip;

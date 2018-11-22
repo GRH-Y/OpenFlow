@@ -8,7 +8,7 @@ import connect.network.nio.NioReceive;
 import connect.network.nio.NioSender;
 import server.p2p.bean.AddressBean;
 import server.p2p.bean.KeyBean;
-import util.Logcat;
+import util.LogDog;
 
 
 /**
@@ -29,10 +29,10 @@ public class P2PSClient extends NioClientTask {
 
     @Override
     public void onConnectSocketChannel(boolean isConnect) {
-        Logcat.i("==> P2PSClient onConnect = " + isConnect);
+        LogDog.i("==> P2PSClient onConnect = " + isConnect);
         KeyBean keyBean = new KeyBean();
         keyBean.setKey("dhu23dh8f3c834fhn24fh919xmb3");
-        String json = JsonUtils.toNewJson(keyBean);
+        String json = JsonUtils.toJson(keyBean);
         if (isConnect) {
             getSender().sendData(json.getBytes());
         }
@@ -40,7 +40,7 @@ public class P2PSClient extends NioClientTask {
 
     private void onReceiveData(byte[] data) {
         String json = new String(data);
-        Logcat.d("==> NioReceive data = " + json);
+        LogDog.d("==> NioReceive data = " + json);
         if (json.contains("ip")) {
             AddressBean addressBean = JsonUtils.toEntity(AddressBean.class, json);
             ConnectTask task = new ConnectTask(addressBean);

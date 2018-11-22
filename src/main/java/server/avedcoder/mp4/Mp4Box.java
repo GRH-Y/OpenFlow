@@ -3,7 +3,7 @@ package server.avedcoder.mp4;
 
 
 
-import util.Logcat;
+import util.LogDog;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -332,7 +332,7 @@ public class Mp4Box {
             if (isHasSrcData) {
                 srcData = new byte[(int) length - buffer.length];
                 mp4File.read(srcData);
-                Logcat.i("==> srcData " + getClass().getName() + " = " + byteToHexStr(srcData));
+                LogDog.i("==> srcData " + getClass().getName() + " = " + byteToHexStr(srcData));
             }
         }
 
@@ -363,9 +363,9 @@ public class Mp4Box {
             minorVersion = String.valueOf(byteToInt(srcData, index));
             index += 4;
             compatibleBrands = new String(srcData, index, srcData.length - index);
-            Logcat.d("==> majorBrand = " + majorBrand);
-            Logcat.d("==> minorVersion = " + minorVersion);
-            Logcat.d("==> compatibleBrands = " + compatibleBrands);
+            LogDog.d("==> majorBrand = " + majorBrand);
+            LogDog.d("==> minorVersion = " + minorVersion);
+            LogDog.d("==> compatibleBrands = " + compatibleBrands);
             srcData = null;
         }
 

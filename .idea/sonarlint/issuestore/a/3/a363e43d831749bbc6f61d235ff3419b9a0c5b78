@@ -1,12 +1,0 @@
-
-Xsquid:S1075"ARefactor your code to get this URI from a customizable parameter.(ÛÞ¿÷
-bsquid:CommentedOutCodeLine"<This block of commented-out lines of code should be removed.(âËäÌ
-bsquid:CommentedOutCodeLine"<This block of commented-out lines of code should be removed.(îßàˆ
-Psquid:S3400 "9Remove this method and declare a constant for this value.(†ü¬Å
-?squid:S1068"(Remove this unused "path" private field.(ÛÞ¿÷
-Bsquid:S1068"+Remove this unused "trigger" private field.(œ†äç
-msquid:S1450"VRemove the "trigger" field and declare it as a local variable in the relevant methods.(œ†äç
-Jsquid:S1068
-".Remove this unused "encodeTask" private field.(´’þ‹üÿÿÿÿ
-gsquid:CommentedOutCodeLine"<This block of commented-out lines of code should be removed.(ÛºÇùÿÿÿÿ
-gsquid:CommentedOutCodeLine("<This block of commented-out lines of code should be removed.(Ûþ¿êúÿÿÿÿ

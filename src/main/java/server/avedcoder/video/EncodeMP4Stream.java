@@ -8,14 +8,14 @@ import server.avedcoder.packet.RtpPacket;
 import task.executor.BaseConsumerTask;
 import task.executor.ConsumerQueueAttribute;
 import task.executor.TaskContainer;
-import task.executor.interfaces.IConsumerAttribute;
-import task.executor.interfaces.IConsumerTaskExecutor;
-import task.executor.interfaces.ILoopTaskExecutor;
+import task.executor.joggle.IConsumerAttribute;
+import task.executor.joggle.IConsumerTaskExecutor;
+import task.executor.joggle.ILoopTaskExecutor;
 import task.message.MessageCourier;
 import task.message.MessageEnvelope;
-import task.message.interfaces.IMsgPostOffice;
+import task.message.joggle.IMsgPostOffice;
 import util.IoUtils;
-import util.Logcat;
+import util.LogDog;
 import util.MultiplexCache;
 
 import java.io.IOException;
@@ -68,7 +68,7 @@ public class EncodeMP4Stream extends BaseConsumerTask<NalPacket> {
     }
 
     public void setMsgPostOffice(IMsgPostOffice postOffice) {
-        messageCourier.setEnvelopeServer(postOffice);
+        messageCourier.addEnvelopeServer(postOffice);
     }
 
     private void initCache() throws Exception {
@@ -96,16 +96,16 @@ public class EncodeMP4Stream extends BaseConsumerTask<NalPacket> {
 
     @Override
     protected void onInitTask() {
-        Logcat.w("==>EncodeMP4Stream startTask ing ....");
+        LogDog.w("==>EncodeMP4Stream startTask ing ....");
         try {
             initFile();
             initCache();
             IConsumerTaskExecutor executor = taskContainer.getTaskExecutor();
             executor.startAsyncProcessData();
             if (!trigger) {
-                Logcat.d("==>EncodeMP4Stream 等待 RTSP播放指令!");
+                LogDog.d("==>EncodeMP4Stream 等待 RTSP播放指令!");
                 taskContainer.getTaskExecutor().waitTask(0);
-                Logcat.d("==>EncodeMP4Stream 收到 RTSP播放指令!");
+                LogDog.d("==>EncodeMP4Stream 收到 RTSP播放指令!");
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -145,7 +145,7 @@ public class EncodeMP4Stream extends BaseConsumerTask<NalPacket> {
                         }
                     }
                 }
-                Logcat.i("======================================================");
+                LogDog.i("======================================================");
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -174,7 +174,7 @@ public class EncodeMP4Stream extends BaseConsumerTask<NalPacket> {
         ts += duration;
         int nalLength = Mp4Analysis.byteToInt(header, 0);
         type = header[4] & 0x1F;
-        Logcat.v("==>EncodeMP4Stream type = " + type + " length = " + (nalLength + 4));
+        LogDog.v("==>EncodeMP4Stream type = " + type + " length = " + (nalLength + 4));
 
         //关键帧
         if (type == 5) {
@@ -268,7 +268,7 @@ public class EncodeMP4Stream extends BaseConsumerTask<NalPacket> {
     @Override
     protected void onIdleStop() {
         IConsumerAttribute attribute = taskContainer.getAttribute();
-        Logcat.w("==>EncodeMP4Stream onIdleStop ing ..start..cache size = " + attribute.getCacheDataSize());
+        LogDog.w("==>EncodeMP4Stream onIdleStop ing ..start..cache size = " + attribute.getCacheDataSize());
         Object data = attribute.popCacheData();
         while (data != null) {
             MessageEnvelope envelope = new MessageEnvelope();
@@ -277,12 +277,12 @@ public class EncodeMP4Stream extends BaseConsumerTask<NalPacket> {
             messageCourier.sendEnvelopSelf(envelope);
             data = attribute.popCacheData();
         }
-        Logcat.w("==>EncodeMP4Stream onIdleStop ing ..end..");
+        LogDog.w("==>EncodeMP4Stream onIdleStop ing ..end..");
     }
 
     @Override
     protected void onDestroyTask() {
-        Logcat.w("==>EncodeMP4Stream stopTask ing ....");
+        LogDog.w("==>EncodeMP4Stream stopTask ing ....");
         try {
             file.close();
             file = null;

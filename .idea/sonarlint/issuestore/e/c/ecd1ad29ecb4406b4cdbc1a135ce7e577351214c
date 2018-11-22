@@ -1,10 +1,0 @@
-
-<squid:S1659"%Declare "channel" on a separate line.(”Å×¸
-<squid:S1659"%Declare "profile" on a separate line.(”Å×¸
-Asquid:S1659"*Declare "samplingRate" on a separate line.(”Å×¸
-Msquid:S1068"6Remove this unused "AUDIO_OBJECT_TYPES" private field.(È˜Ù
-jsquid:S20955"NUse try-with-resources or close this "RandomAccessFile" in a "finally" clause.(´þìüÿÿÿÿ
-gsquid:CommentedOutCodeLineL"<This block of commented-out lines of code should be removed.(²Í¦¯ÿÿÿÿÿ
-Qsquid:S1118":Add a private constructor to hide the implicit public one.(ÎŠ‡‘
-^squid:S001121"FDefine and throw a dedicated exception instead of using a generic one.(ôòå
-4squid:S2386"Make this member "protected".(²î”à

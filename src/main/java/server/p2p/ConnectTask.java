@@ -5,7 +5,7 @@ import connect.network.nio.NioClientTask;
 import connect.network.nio.NioReceive;
 import connect.network.nio.NioSender;
 import server.p2p.bean.AddressBean;
-import util.Logcat;
+import util.LogDog;
 
 public class ConnectTask extends NioClientTask {
 
@@ -24,7 +24,7 @@ public class ConnectTask extends NioClientTask {
 
     @Override
     public void onConnectSocketChannel(boolean isConnect) {
-        Logcat.i("==> InterFlowTask onConnect = " + isConnect);
+        LogDog.i("==> InterFlowTask onConnect = " + isConnect);
     }
 
 }

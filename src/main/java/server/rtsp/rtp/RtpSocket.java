@@ -15,9 +15,9 @@ import java.util.Random;
  * @author yyz
  */
 public class RtpSocket {
-    private RtcpReportSocket reportSocket = null;
-    private JavUdpConnect connect = null;
-    private RtpPacket rtpPacket = null;
+    private RtcpReportSocket reportSocket;
+    private JavUdpConnect connect;
+    private RtpPacket rtpPacket;
     private int ssrc = 0;
     private int seq = 0;
 

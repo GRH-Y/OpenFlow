@@ -1,53 +1,0 @@
-
-8squid:S1643v"Use a StringBuilder instead.(ÛÚì±ûÿÿÿÿ
-nsquid:S3776O"RRefactor this method to reduce its Cognitive Complexity from 20 to the 15 allowed.(ŸÏ…´øÿÿÿÿ
-jsquid:S3008"NRename this field "SPS" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(óê†Âûÿÿÿÿ
-\squid:HiddenFieldCheckú"9Rename "index" which hides the field declared at line 32.(©’°¶
-bsquid:CommentedOutCodeLiney"<This block of commented-out lines of code should be removed.(åìõâ
-Š"squid:ClassVariableVisibilityCheck¨"VMake startIndex a static final constant or non-public and provide accessors if needed.(õ÷óÇûÿÿÿÿ
-dsquid:S00112Õ"FDefine and throw a dedicated exception instead of using a generic one.(·ı©‹øÿÿÿÿ
-asquid:HiddenFieldCheckÒ"9Rename "index" which hides the field declared at line 32.(¥ ÜĞûÿÿÿÿ
-t
-squid:S135S"YReduce the total number of break and continue statements in this loop to use at most one.(Å‹˜ÿÿÿÿÿ
-[squid:HiddenFieldCheck"8Rename "file" which hides the field declared at line 33.(–Äí÷
-osquid:S3776Í"RRefactor this method to reduce its Cognitive Complexity from 39 to the 15 allowed.(ãÎ¦âûÿÿÿÿ
-Š squid:ForLoopCounterChangedCheckü"XRefactor the code in order to not assign to this loop counter from within the loop body.(Îø„Õûÿÿÿÿ
-ƒ"squid:ClassVariableVisibilityCheck"PMake mdat a static final constant or non-public and provide accessors if needed.(À·ˆüÿÿÿÿ
-hsquid:CommentedOutCodeLineĞ"<This block of commented-out lines of code should be removed.(¶ÈŒøÿÿÿÿ
-[squid:HiddenFieldCheck‚"8Rename "file" which hides the field declared at line 33.(–Äí÷
-u
-squid:S135°"YReduce the total number of break and continue statements in this loop to use at most one.(¥ ÜĞûÿÿÿÿ
->squid:S1168È"&Return an empty array instead of null.(¥¹ï
-dsquid:S00112Æ"FDefine and throw a dedicated exception instead of using a generic one.(Ïã¡İşÿÿÿÿ
-hsquid:CommentedOutCodeLineº"<This block of commented-out lines of code should be removed.(¡„İúøÿÿÿÿ
-csquid:S00112D"FDefine and throw a dedicated exception instead of using a generic one.(”Ö¦öıÿÿÿÿ
-[squid:HiddenFieldCheck÷"8Rename "file" which hides the field declared at line 33.(–Äí÷
-hsquid:CommentedOutCodeLineå"<This block of commented-out lines of code should be removed.(šãÙ‚ûÿÿÿÿ
-Nsquid:S2696ƒ"6Make the enclosing method "static" or remove this set.(¡¬—µ
-Msquid:S2696*"6Make the enclosing method "static" or remove this set.(‘¿×
-Š squid:ForLoopCounterChangedCheckı"XRefactor the code in order to not assign to this loop counter from within the loop body.(Ø²Èİÿÿÿÿÿ
-?squid:S11487"#Use a logger to log this exception.(€ÉÔ…ıÿÿÿÿ
-Rsquid:S2696)"6Make the enclosing method "static" or remove this set.(³³¶şÿÿÿÿ
-Š"squid:ClassVariableVisibilityCheck£"[Make SamplesPerChunk a static final constant or non-public and provide accessors if needed.(¨¸ú«
-squid:S00116¤"aRename this field "SampleDescriptionIndex" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.( ÔÃöüÿÿÿÿ
-@squid:S1148Å"#Use a logger to log this exception.(€ÉÔ…ıÿÿÿÿ
-Nsquid:S2696À"6Make the enclosing method "static" or remove this set.(¡¬—µ
-9squid:S2386"Make this member "protected".(À·ˆüÿÿÿÿ
-ssquid:S00116£"ZRename this field "SamplesPerChunk" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(¨¸ú«
-hsquid:CommentedOutCodeLineË"<This block of commented-out lines of code should be removed.(§ûÎ¯ıÿÿÿÿ
-–"squid:ClassVariableVisibilityCheck¤"bMake SampleDescriptionIndex a static final constant or non-public and provide accessors if needed.( ÔÃöüÿÿÿÿ
-Fsquid:S1444"*Make this "public static mdat" field final(À·ˆüÿÿÿÿ
->squid:S1168Ğ"&Return an empty array instead of null.(¥¹ï
-dsquid:S3008"NRename this field "PPS" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Íˆ´K
-csquid:CommentedOutCodeLine£"<This block of commented-out lines of code should be removed.(Ú°à¬
-u
-squid:S135Ò"YReduce the total number of break and continue statements in this loop to use at most one.(¥ ÜĞûÿÿÿÿ
-bsquid:CommentedOutCodeLineK"<This block of commented-out lines of code should be removed.(Ú°à¬
-Ssquid:S2696‰"6Make the enclosing method "static" or remove this set.(“…™ßÿÿÿÿÿ
-Ssquid:S2696Æ"6Make the enclosing method "static" or remove this set.(“…™ßÿÿÿÿÿ
-hsquid:CommentedOutCodeLineÃ"<This block of commented-out lines of code should be removed.(¡„İúøÿÿÿÿ
-ˆ"squid:ClassVariableVisibilityCheck©"TMake endIndex a static final constant or non-public and provide accessors if needed.(Ä‰è§øÿÿÿÿ
-Š"squid:ClassVariableVisibilityCheck¢"VMake firstChunk a static final constant or non-public and provide accessors if needed.(”«¢Ìÿÿÿÿÿ
-asquid:HiddenFieldCheckï"9Rename "index" which hides the field declared at line 32.(ù¿·ùıÿÿÿÿ
-hsquid:CommentedOutCodeLineÓ"<This block of commented-out lines of code should be removed.(Ë°¢şÿÿÿÿ
-asquid:HiddenFieldCheck°"9Rename "index" which hides the field declared at line 32.(¥ ÜĞûÿÿÿÿ

@@ -4,7 +4,7 @@ package server.rtsp;
 import connect.network.nio.*;
 import server.rtsp.protocol.RtspProtocol;
 import server.rtsp.rtp.RtpSocket;
-import util.Logcat;
+import util.LogDog;
 import util.NetUtils;
 
 import java.io.IOException;
@@ -50,13 +50,13 @@ public class RtspServer extends NioServerTask {
 
 //    @Override
 //    protected void onAcceptTimeout() {
-//        Logcat.v("==> RtspServer running, port = " + getServerPort() + " client connect number = " + connectCache.size());
+//        LogDog.v("==> RtspServer running, port = " + getServerPort() + " client connect number = " + connectCache.size());
 //    }
 
 
     @Override
     protected void onAcceptServerChannel(SocketChannel channel) {
-        Logcat.w("==> RtspServer has client connect come...");
+        LogDog.w("==> RtspServer has client connect come...");
         Client client = new Client(channel);
         NioClientFactory factory = NioClientFactory.getFactory();
         factory.open();
@@ -78,7 +78,7 @@ public class RtspServer extends NioServerTask {
     protected void onCloseServerChannel() {
         dataSrc.stopAudioEncode();
         dataSrc.stopVideoEncode();
-        Logcat.w("==> RtspServer stopTask ing....");
+        LogDog.w("==> RtspServer stopTask ing....");
         for (Client connect : connectCache) {
             NioClientFactory factory = NioClientFactory.getFactory();
             factory.open();
@@ -90,7 +90,7 @@ public class RtspServer extends NioServerTask {
     private void notifyStop(NioClientTask connect) {
         connectCache.remove(connect);
         if (connectCache.size() == 0) {
-            Logcat.w("==>  当前没有客户端连接，停止音视频线程!");
+            LogDog.w("==>  当前没有客户端连接，停止音视频线程!");
             dataSrc.stopAudioEncode();
             dataSrc.stopVideoEncode();
         }
@@ -151,7 +151,7 @@ public class RtspServer extends NioServerTask {
                 request.method = new String(data);
             }
             data = processRequest(request);
-            Logcat.d("发送给客户端 ：" + new String(data));
+            LogDog.d("发送给客户端 ：" + new String(data));
             getSender().sendData(data);
         }
 
@@ -168,7 +168,7 @@ public class RtspServer extends NioServerTask {
             if (!str.contains("RTSP/1.0")) {
                 throw new SocketException("IllegalArgumentException = " + str);
             }
-            Logcat.d("==>接收到RTSP客户端的请求 : " + str);
+            LogDog.d("==>接收到RTSP客户端的请求 : " + str);
             Request request = new Request();
 
             String[] array = str.split("\\r\\n");
@@ -188,7 +188,7 @@ public class RtspServer extends NioServerTask {
 //            matcher = regexHeader.matcher(str);
 //            matcher.find();
 //            request.headers.put(matcher.group(1).toLowerCase(Locale.US), matcher.group(2));
-//            Logcat.i("==> parseRequest : " + " method = " + request.method + " seq = " + request.seq);
+//            LogDog.i("==> parseRequest : " + " method = " + request.method + " seq = " + request.seq);
             return request;
         }
 
@@ -371,7 +371,7 @@ public class RtspServer extends NioServerTask {
                 videoSocket.stopConnect();
             }
             notifyStop(this);
-            Logcat.w("==> RtspServer 断开与" + remoteAddress + "客户端的链接...");
+            LogDog.w("==> RtspServer 断开与" + remoteAddress + "客户端的链接...");
         }
 
 

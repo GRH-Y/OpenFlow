@@ -9,7 +9,7 @@ import server.rtsp.rtp.RtpSocket;
 import task.message.MessageCourier;
 import task.message.MessageEnvelope;
 import task.message.MessagePostOffice;
-import util.Logcat;
+import util.LogDog;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +31,7 @@ public class DataSrc {
     public DataSrc() {
         courier = new MessageCourier(this);
         postOffice = new MessagePostOffice();
-        courier.setEnvelopeServer(postOffice);
+        courier.addEnvelopeServer(postOffice);
         videoSet = new ArrayList<>();
         audioSet = new ArrayList<>();
     }
@@ -179,7 +179,7 @@ public class DataSrc {
                 }
             }
         } else {
-            Logcat.e("==> DataSrc onAudioVideo other data !!!");
+            LogDog.e("==> DataSrc onAudioVideo other data !!!");
         }
     }
 }
