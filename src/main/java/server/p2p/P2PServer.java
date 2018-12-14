@@ -1,8 +1,8 @@
 package server.p2p;
 
 
-import connect.json.JsonUtils;
 import connect.network.nio.*;
+import json.JsonUtils;
 import server.p2p.bean.AddressBean;
 import server.p2p.bean.KeyBean;
 import util.IoUtils;
@@ -85,8 +85,9 @@ public class P2PServer extends NioServerTask {
             protected boolean onRead(SocketChannel channel) throws IOException {
                 byte[] data = IoUtils.tryRead(channel);
                 if (data != null) {
-                    LogDog.d("==> ClientReceive data = " + new String(data));
-                    KeyBean keyBean = JsonUtils.toEntity(KeyBean.class, data);
+                    String json = new String(data);
+                    LogDog.d("==> ClientReceive data = " + json);
+                    KeyBean keyBean = JsonUtils.toEntity(KeyBean.class, json);
                     if (nioClientTaskMap.containsKey(keyBean.getKey())) {
                         NioClientTask task = nioClientTaskMap.get(keyBean.getKey());
                         NioSender otherSender = task.getSender();
