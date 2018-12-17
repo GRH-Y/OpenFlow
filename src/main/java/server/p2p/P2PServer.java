@@ -46,7 +46,7 @@ public class P2PServer extends NioServerTask {
     @Override
     protected void onOpenServerChannel(boolean isSuccess) {
         LogDog.i("==> P2PServer onConnect = " + isSuccess);
-        LogDog.d("==> P2PServer address = " + getHost() + ":" + getPort());
+        LogDog.d("==> P2PServer address = " + getServerHost() + ":" + getServerPort());
     }
 
 
@@ -82,7 +82,7 @@ public class P2PServer extends NioServerTask {
 
 
             @Override
-            protected boolean onRead(SocketChannel channel) throws IOException {
+            protected boolean onRead(SocketChannel channel) {
                 byte[] data = IoUtils.tryRead(channel);
                 if (data != null) {
                     String json = new String(data);

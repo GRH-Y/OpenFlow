@@ -29,7 +29,13 @@ public class DataSrc {
     private MessagePostOffice postOffice;
     private MessageCourier courier;
 
-    public DataSrc() {
+    private String filePath;
+
+    public DataSrc(String filePath) {
+        this.filePath = filePath;
+        if (filePath == null) {
+            throw new NullPointerException("filePath is null !!!!");
+        }
         courier = new MessageCourier(this);
         postOffice = new MessagePostOffice();
         courier.addEnvelopeServer(postOffice);
@@ -86,10 +92,7 @@ public class DataSrc {
 //        }
         if (mp4Stream == null) {
             try {
-                File directory = new File("");
-                String path = directory.getAbsolutePath() + File.separator + "src" + File.separator + "main" +
-                        File.separator + "resources" + File.separator + "video.mp4";
-                mp4Stream = new EncodeMP4Stream(path);
+                mp4Stream = new EncodeMP4Stream(filePath);
             } catch (Exception e) {
                 e.printStackTrace();
                 mp4Stream = null;
@@ -98,8 +101,7 @@ public class DataSrc {
     }
 
     public void initAudioEncode() {
-        String path = "/home/dev-ubuntu/test.mp4";
-        audioThread = new EncodeAACStream(path);
+        audioThread = new EncodeAACStream(filePath);
     }
 
     public void startVideoEncode() {
