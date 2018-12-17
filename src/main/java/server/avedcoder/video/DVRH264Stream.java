@@ -1,7 +1,7 @@
 package server.avedcoder.video;
 
 
-import server.avedcoder.camera.H264Preview;
+import server.camera.H264Preview;
 import server.avedcoder.packet.ContentPacket;
 import server.avedcoder.packet.NalPacket;
 import server.avedcoder.packet.RtpPacket;

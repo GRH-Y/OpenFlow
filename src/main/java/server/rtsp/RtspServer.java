@@ -25,7 +25,6 @@ import java.util.regex.Pattern;
  */
 
 public class RtspServer extends NioServerTask {
-    //    private ISessionCallBack callBack;
     private DataSrc dataSrc = null;
     /**
      * 链接的客户端
@@ -35,22 +34,20 @@ public class RtspServer extends NioServerTask {
     public RtspServer(int port) {
         String ip = NetUtils.getLocalIp("wlan0");
         setAddress(ip, port);
-//        callBack = new JavSessionCallBack(this);
     }
 
-    public RtspServer(int port, String netInterface) throws SocketException {
-        String ip = NetUtils.getLocalIp(netInterface);
+    public RtspServer(String ip, int port) {
         setAddress(ip, port);
-//        callBack = new JavSessionCallBack(this);
     }
 
     public void setDataSrc(DataSrc dataSrc) {
         this.dataSrc = dataSrc;
     }
 
+
 //    @Override
-//    protected void onAcceptTimeout() {
-//        LogDog.v("==> RtspServer running, port = " + getServerPort() + " client connect number = " + connectCache.size());
+//    protected void onAcceptTimeoutServer() {
+//        //LogDog.v("==> RtspServer running, server address = " + getIpAndPort() + " client connect number = " + connectCache.size());
 //    }
 
 
@@ -67,10 +64,11 @@ public class RtspServer extends NioServerTask {
 
     @Override
     protected void onOpenServerChannel(boolean isSuccess) {
-//        if (isSuccess) {
+        if (isSuccess) {
+            LogDog.v("==> RtspServer running, server address = " + getServerHost() + " client connect number = " + connectCache.size());
 //            dataSrc.startVideoEncode();
 //            dataSrc.startAudioEncode();
-//        }
+        }
     }
 
 

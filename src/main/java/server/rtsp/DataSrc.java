@@ -11,6 +11,7 @@ import task.message.MessageEnvelope;
 import task.message.MessagePostOffice;
 import util.LogDog;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -85,7 +86,9 @@ public class DataSrc {
 //        }
         if (mp4Stream == null) {
             try {
-                String path = "/home/dev-ubuntu/Videos/test.mp4";
+                File directory = new File("");
+                String path = directory.getAbsolutePath() + File.separator + "src" + File.separator + "main" +
+                        File.separator + "resources" + File.separator + "video.mp4";
                 mp4Stream = new EncodeMP4Stream(path);
             } catch (Exception e) {
                 e.printStackTrace();

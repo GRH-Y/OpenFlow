@@ -1,4 +1,4 @@
-package server.avedcoder.camera;
+package server.camera;
 
 
 import util.LogDog;
