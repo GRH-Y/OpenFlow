@@ -82,7 +82,7 @@ public class P2PServer extends NioServerTask {
 
 
             @Override
-            protected boolean onRead(SocketChannel channel) {
+            protected void onRead(SocketChannel channel) throws Exception {
                 byte[] data = IoUtils.tryRead(channel);
                 if (data != null) {
                     String json = new String(data);
@@ -98,7 +98,6 @@ public class P2PServer extends NioServerTask {
                         nioClientTaskMap.put(keyBean.getKey(), Client.this);
                     }
                 }
-                return true;
             }
 
         }

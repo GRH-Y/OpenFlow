@@ -1,19 +1,19 @@
 package server.avedcoder.audio;
 
 
-import server.avedcoder.packet.NalPacket;
+import server.rtsp.packet.NalPacket;
 import task.executor.BaseConsumerTask;
 import task.message.MessagePostOffice;
 
 public class EncodeAACStream {
     private int encodingBitRate = 32000;
-    private EncodeTask encodeTask = null;
+    private DecodeTask encodeTask = null;
     private boolean trigger = false;
-    private String path = "F:\\FFOutput\\test_file_stream.mp4";
+    private String path;
 
     public EncodeAACStream(String path) {
         this.path = path;
-//        encodeTask = new EncodeTask();
+//        encodeTask = new DecodeTask();
     }
 
     public void setAudioOutSwitch(boolean audioOutSwitch) {
@@ -40,7 +40,7 @@ public class EncodeAACStream {
 //        encodeTask.setMsgPostOffice(postOffice);
     }
 
-    private class EncodeTask extends BaseConsumerTask<NalPacket> {
+    private class DecodeTask extends BaseConsumerTask<NalPacket> {
     }
 
 

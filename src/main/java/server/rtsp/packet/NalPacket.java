@@ -1,4 +1,4 @@
-package server.avedcoder.packet;
+package server.rtsp.packet;
 
 /**
  * NalPacket
@@ -99,12 +99,4 @@ public class NalPacket {
         return data;
     }
 
-    public void release() {
-        data = null;
-        try {
-            finalize();
-        } catch (Throwable throwable) {
-            throwable.printStackTrace();
-        }
-    }
 }

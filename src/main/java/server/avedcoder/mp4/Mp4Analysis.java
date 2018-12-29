@@ -1,4 +1,4 @@
-package server.avedcoder.video;
+package server.avedcoder.mp4;
 
 
 import java.io.File;
@@ -24,9 +24,14 @@ public class Mp4Analysis {
      */
     private int[] mdatIndex = null;
 
+    //每个chunk的偏移
     private int[] arrayStco = null;
+    //每个sample的大小
     private int[] arrayStsz = null;
+    //sample和chunk的映射表
     private int[] arrayStsc = null;
+    //关键帧列表
+    private int[] arrayStss = null;
 
 
     private long index = 0;
@@ -312,6 +317,8 @@ public class Mp4Analysis {
      */
     public void findVideoBox() throws Exception {
         try {
+            //查找stss
+//            arrayStss = findVideoStss(boxesMap,file);
             //查找stco
             arrayStco = findVideoStco(boxesMap, file);
             //查找stsz
@@ -361,7 +368,9 @@ public class Mp4Analysis {
      */
     public int[] findBoxStbl(Map<String, Box> boxesMap, RandomAccessFile file, String boxName) throws Exception {
         byte[] data = findBox(boxesMap, file, boxName);
-        int skip = boxName.contains("arrayStsz") ? 12 : 8;
+        //头部是stsz的数量所以要加4
+        int skip = boxName.contains("video_stsz") ? 12 : 8;
+
         int[] ret = new int[(data.length - skip) / 4];
         int count = 0;
         for (int index = skip; index < data.length; index += 4) {
@@ -402,6 +411,17 @@ public class Mp4Analysis {
 
     public int[] findVideoStco(Map<String, Box> boxesMap, RandomAccessFile file) throws Exception {
         return findBoxStbl(boxesMap, file, "video_stco");
+    }
+
+    public int[] findVideoStss(Map<String, Box> boxesMap, String path) throws Exception {
+        RandomAccessFile file = new RandomAccessFile(path, "r");
+        int[] ret = findVideoStss(boxesMap, file);
+        file.close();
+        return ret;
+    }
+
+    public int[] findVideoStss(Map<String, Box> boxesMap, RandomAccessFile file) throws Exception {
+        return findBoxStbl(boxesMap, file, "video_stss");
     }
 
     public void findAvcC() throws Exception {
@@ -503,11 +523,11 @@ public class Mp4Analysis {
         List<Stsc> stscList = null;
         if (arrayStsc != null) {
             stscList = new ArrayList<>(arrayStsc.length / 3);
-            for (int index = 0; index < arrayStsc.length; index++) {
+            for (int index = 0; index < arrayStsc.length;) {
                 Stsc stsc = new Stsc();
-                stsc.firstChunk = --arrayStsc[index++];
+                stsc.firstChunk = arrayStsc[index++];
                 stsc.SamplesPerChunk = arrayStsc[index++];
-                stsc.SampleDescriptionIndex = arrayStsc[index];
+                stsc.SampleDescriptionIndex = arrayStsc[index++];
                 stscList.add(stsc);
             }
         }

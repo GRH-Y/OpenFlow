@@ -1,4 +1,4 @@
-package server.avedcoder.video;
+package server.avedcoder.mp4;
 
 public class NalAnalysis {
 

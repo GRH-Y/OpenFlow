@@ -2,16 +2,15 @@ package server.rtsp;
 
 
 import server.avedcoder.audio.EncodeAACStream;
-import server.avedcoder.packet.NalPacket;
-import server.avedcoder.packet.RtpPacket;
-import server.avedcoder.video.EncodeMP4Stream;
+import server.avedcoder.video.DecodeMP4Stream;
+import server.rtsp.packet.NalPacket;
+import server.rtsp.packet.RtpPacket;
 import server.rtsp.rtp.RtpSocket;
 import task.message.MessageCourier;
 import task.message.MessageEnvelope;
 import task.message.MessagePostOffice;
 import util.LogDog;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,7 +19,7 @@ import java.util.List;
  */
 
 public class DataSrc {
-    private EncodeMP4Stream mp4Stream = null;
+    private DecodeMP4Stream mp4Stream = null;
     private EncodeAACStream audioThread = null;
 
     private List<RtpSocket> videoSet;
@@ -64,7 +63,7 @@ public class DataSrc {
         if (videoSet.size() == 0) {
 //            videoThread.setVideoOutSwitch(true);
             mp4Stream.setVideoOutSwitch(true);
-            mp4Stream.pushStream();
+            mp4Stream.resumeSteam();
         }
         videoSet.add(video);
     }
@@ -73,6 +72,7 @@ public class DataSrc {
         audioSet.remove(audio);
         if (audioSet.size() == 0) {
             audioThread.setAudioOutSwitch(false);
+            stopAudioEncode();
         }
     }
 
@@ -81,6 +81,7 @@ public class DataSrc {
         if (videoSet.size() == 0) {
 //            videoThread.setVideoOutSwitch(false);
             mp4Stream.setVideoOutSwitch(false);
+            stopVideoEncode();
         }
     }
 
@@ -92,7 +93,7 @@ public class DataSrc {
 //        }
         if (mp4Stream == null) {
             try {
-                mp4Stream = new EncodeMP4Stream(filePath);
+                mp4Stream = new DecodeMP4Stream(filePath);
             } catch (Exception e) {
                 e.printStackTrace();
                 mp4Stream = null;
@@ -107,13 +108,13 @@ public class DataSrc {
     public void startVideoEncode() {
 //        videoThread.setMsgPostOffice(postOffice);
 //        videoThread.startEncode();
-        mp4Stream.setMsgPostOffice(postOffice);
-        mp4Stream.openStream();
+        mp4Stream.setMsgPostOffice(postOffice,"onAudioVideo");
+        mp4Stream.startSteam();
     }
 
     public void stopVideoEncode() {
 //        videoThread.stopEncode();
-        mp4Stream.closeStream();
+        mp4Stream.stopSteam();
     }
 
     public void startAudioEncode() {
@@ -148,6 +149,15 @@ public class DataSrc {
         return audioThread.getSamplingRate();
     }
 
+    private void sendData(NalPacket packet, List<RtpSocket> socketList) {
+        RtpSocket socket = socketList.get(0);
+        RtpPacket rtpPacket = socket.sendNalPacket(packet);
+        for (int index = 1; index < socketList.size(); index++) {
+            RtpSocket tmp = socketList.get(index);
+            tmp.sendRtpPacket(rtpPacket);
+        }
+    }
+
 
     private void onAudioVideo(MessageEnvelope envelope) {
         if (audioSet.size() == 0 || videoSet.size() == 0) {
@@ -157,19 +167,9 @@ public class DataSrc {
         if (object instanceof NalPacket) {
             NalPacket packet = (NalPacket) envelope.getData();
             if (NalPacket.PacketType.AUDIO == packet.getPacketType()) {
-                RtpSocket tmp = audioSet.get(0);
-                RtpPacket rtpPacket = tmp.sendNalPacket(packet);
-                for (int index = 1; index < audioSet.size(); index++) {
-                    RtpSocket audio = audioSet.get(index);
-                    audio.sendRtpPacket(rtpPacket);
-                }
+                sendData(packet,audioSet);
             } else {
-                RtpSocket tmp = videoSet.get(0);
-                RtpPacket rtpPacket = tmp.sendNalPacket(packet);
-                for (int index = 1; index < videoSet.size(); index++) {
-                    RtpSocket video = videoSet.get(index);
-                    video.sendRtpPacket(rtpPacket);
-                }
+                sendData(packet,videoSet);
             }
             packet.setFullNal(false);
         } else if (object instanceof RtpPacket) {

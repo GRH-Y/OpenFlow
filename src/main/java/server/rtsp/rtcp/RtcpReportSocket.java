@@ -28,20 +28,20 @@ import connect.network.udp.JavUdpConnect;
 public class RtcpReportSocket {
 
     private static final int PACKET_LENGTH = 28;
-    private JavUdpConnect connect = null;
+    private JavUdpConnect connect;
     private byte[] mBuffer = new byte[PACKET_LENGTH];
     private int mOctetCount = 0, mPacketCount = 0;
     private long interval = 5000, delta, now, oldnow;
 
 
     public RtcpReportSocket(String ip, int port, int ssrc) {
-        /*							    Version(2)  Padding(0)					 					*/
-        /*									 ^		  ^			PT = 0	    						*/
-        /*									 |		  |				^								*/
-        /*									 | --------			 	|								*/
-        /*									 | |---------------------								*/
-        /*									 | ||													*/
-        /*								     | ||													*/
+        /*							         Version(2)  Padding(0)				*/
+        /*									     ^		  ^			PT = 0	    */
+        /*									     |		  |				^		*/
+        /*									     | --------			 	|		*/
+        /*									     | |---------------------		*/
+        /*							 		     | ||							*/
+        /*								         | ||							*/
         mBuffer[0] = (byte) Integer.parseInt("10000000", 2);
 
         /* Packet Type PT */
@@ -101,7 +101,7 @@ public class RtcpReportSocket {
         setLong(mOctetCount, 24, 28);
 
 //        now = SystemClock.elapsedRealtime();
-        now = System.nanoTime();
+        now = System.currentTimeMillis();
         delta += oldnow != 0 ? now - oldnow : 0;
         oldnow = now;
         if (interval > 0 && delta >= interval) {

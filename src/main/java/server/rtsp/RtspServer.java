@@ -4,8 +4,10 @@ package server.rtsp;
 import connect.network.nio.*;
 import server.rtsp.protocol.RtspProtocol;
 import server.rtsp.rtp.RtpSocket;
+import util.IoUtils;
 import util.LogDog;
 import util.NetUtils;
+import util.ThreadAnnotation;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -77,12 +79,7 @@ public class RtspServer extends NioServerTask {
         dataSrc.stopAudioEncode();
         dataSrc.stopVideoEncode();
         LogDog.w("==> RtspServer stopTask ing....");
-        for (Client connect : connectCache) {
-            NioClientFactory factory = NioClientFactory.getFactory();
-            factory.open();
-            factory.removeTask(connect);
-        }
-        connectCache.clear();
+        NioClientFactory.getFactory().close();
     }
 
     private void notifyStop(NioClientTask connect) {
@@ -117,6 +114,7 @@ public class RtspServer extends NioServerTask {
             setSender(new NioSender());
             setReceive(new NioReceive(this, "onReceiveData"));
         }
+
 
         @Override
         protected void onConnectSocketChannel(boolean isConnect) {
@@ -221,30 +219,35 @@ public class RtspServer extends NioServerTask {
 //                long mTimestamp = (uptime / 1000) << 32 & (((uptime - ((uptime / 1000) * 1000)) >> 32) / 1000); // NTP timestamp
                 sb.append("v=0\r\n");
                 // Add IPV6 support
-                // sb.append("o=- " + mTimestamp + " " + mTimestamp + " IN IP4 " + getServerIp() + "\r\n");
-                sb.append("o=- 0 0 IN IP4 " + localAddress + "\r\n");
+                // sb.append("o=- " + session id + " " + session id + " IN IP4 " + getServerIp() + "\r\n");
+                sb.append("o=- " + RtspProtocol.SESSION + " " + RtspProtocol.SESSION + " IN IP4 " + localAddress + "\r\n");
                 sb.append("s=Unnamed\r\n");
                 sb.append("i=N/A\r\n");
-                sb.append("c=IN IP4 " + remoteAddress + "\r\n");
-                // t=0 0 means the session is permanent (we don't know when it will stopTask)
+                sb.append("c=IN IP4 " + localAddress + "\r\n");
                 sb.append("t=0 0\r\n");
+//                sb.append("a=range:npt=0- 596.458\r\n");
+                sb.append("a=control:*\r\n");
                 sb.append("a=recvonly\r\n");
 
-                // Prevents two different sessions from using the same peripheral at the same time
-                sb.append("m=audio 5004 RTP/AVP 96\r\n");
+                //音频信息配置
+//                sb.append("m=audio 5004 RTP/AVP 96\r\n");
                 //AMR编码
 //                sb.append("a=rtpmap:96 AMR/8000\r\n");
-//                sb.append("a=fmtp:96 octet-align=1;\r\n");
                 //AAC编码
-                sb.append("a=rtpmap:96 mpeg4-generic/" + dataSrc.getSamplingRate() + "\r\n");
-                sb.append("a=fmtp:96 streamtype=5; profile-level-id=15; mode=AAC-hbr; config=" + dataSrc.getConfig() +
-                        "; SizeLength=13; IndexLength=3; IndexDeltaLength=3;\r\n");
+//                sb.append("a=rtpmap:96 mpeg4-generic/" + dataSrc.getSamplingRate() + "\r\n");
+//                sb.append("a=fmtp:96 octet-align=1;\r\n");
+//                sb.append("a=fmtp:96 streamtype=5; profile-level-id=1; mode=AAC-hbr; config=" + dataSrc.getConfig() +
+//                        ";sizelength=13;indexlength=3;indexdeltalength=3;\r\n");
+//                sb.append("a=control:trackID=" + 0 + "\r\n");
 
-                sb.append("a=control:trackID=" + 0 + "\r\n");
+                //视频信息配置
                 sb.append("m=video 5006 RTP/AVP 96\r\n");
                 sb.append("a=rtpmap:96 H264/90000\r\n");
                 sb.append("a=fmtp:96 packetization-mode=1;profile-level-id=" + dataSrc.getProfileLevel() +
                         ";sprop-parameter-sets=" + dataSrc.getBase64SPS() + "," + dataSrc.getBase64PPS() + ";\r\n");
+//                sb.append("a=cliprect:0,0,160,240" + "\r\n");
+//                sb.append("a=framesize:97 240-160" + "\r\n");
+                sb.append("a=framerate:24.0" + "\r\n");
                 sb.append("a=control:trackID=" + 1 + "\r\n");
 
                 response = RtspProtocol.responseDescribe(localAddress + ":" + localPort, request.seq, sb.toString());
@@ -267,14 +270,14 @@ public class RtspServer extends NioServerTask {
                 int rtpPort = 0, rtcpPort = 0;
 
                 if (!matcher.find()) {
-                    response = RtspProtocol.responseError(RtspProtocol.STATUS_BAD_REQUEST);
+                    response = RtspProtocol.responseError(RtspProtocol.STATUS_BAD_REQUEST, request.seq);
                     return response.getBytes();
                 }
                 //0 是音频，1 是视频
                 int trackId = Integer.parseInt(matcher.group(1));
                 if (trackId > 1 || trackId < 0) {
                     //非法的trackId
-                    response = RtspProtocol.responseError(RtspProtocol.STATUS_BAD_REQUEST);
+                    response = RtspProtocol.responseError(RtspProtocol.STATUS_BAD_REQUEST, request.seq);
                     return response.getBytes();
                 }
 
@@ -348,12 +351,17 @@ public class RtspServer extends NioServerTask {
                 factory.removeTask(this);
                 response = RtspProtocol.responseTeardown(request.seq);
             }
-
+            /* ********************************************************************************** */
+            /* ********************************* Method GET_PARAMETER *************************** */
+            /* ********************************************************************************** */
+            else if (request.method.equalsIgnoreCase("GET_PARAMETER")) {
+                response = RtspProtocol.responseGetParameter(request.seq);
+            }
             /* ********************************************************************************** */
             /* ********************************* Unknown method ? ******************************* */
             /* ********************************************************************************** */
             else {
-                response = RtspProtocol.responseError(RtspProtocol.STATUS_BAD_REQUEST);
+                response = RtspProtocol.responseError(RtspProtocol.STATUS_BAD_REQUEST, request.seq);
             }
             return response.getBytes();
         }

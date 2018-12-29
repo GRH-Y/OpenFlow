@@ -1,17 +1,18 @@
 package server.avedcoder.video;
 
 
+import server.avedcoder.mp4.Mp4Analysis;
+import server.avedcoder.mp4.NalAnalysis;
 import server.camera.H264Preview;
-import server.avedcoder.packet.ContentPacket;
-import server.avedcoder.packet.NalPacket;
-import server.avedcoder.packet.RtpPacket;
+import server.rtsp.packet.ContentPacket;
+import server.rtsp.packet.NalPacket;
+import server.rtsp.packet.RtpPacket;
 import task.executor.BaseConsumerTask;
 import task.executor.ConsumerQueueAttribute;
 import task.executor.TaskContainer;
 import task.executor.joggle.IConsumerAttribute;
 import task.executor.joggle.IConsumerTaskExecutor;
 import task.executor.joggle.ILoopTaskExecutor;
-import task.message.MessageCourier;
 import task.message.MessageEnvelope;
 import task.message.joggle.IMsgPostOffice;
 import util.LogDog;
@@ -27,7 +28,7 @@ import java.util.List;
  */
 
 public class DVRH264Stream {
-    private MessageCourier messageCourier;
+    private IMsgPostOffice msgPostOffice;
     private TaskContainer container;
     private int width = 640;
     private int height = 480;
@@ -38,18 +39,14 @@ public class DVRH264Stream {
     private byte[] keyNal = null;
 
     public DVRH264Stream() {
-        messageCourier = new MessageCourier(this);
         RecorderTask recorderTask = new RecorderTask();
         container = new TaskContainer(recorderTask);
         container.setAttribute(new ConsumerQueueAttribute<>());
     }
 
-    public MessageCourier getMessageCourier() {
-        return messageCourier;
-    }
 
     public void setMsgPostOffice(IMsgPostOffice postOffice) {
-        messageCourier.addEnvelopeServer(postOffice);
+        this.msgPostOffice = postOffice;
     }
 
 
@@ -151,12 +148,11 @@ public class DVRH264Stream {
             }
         }
 
-        private void initCache() throws Exception {
+        private void initCache(){
             int size = 100;
             contentPacketCache = new MultiplexCache<>(size);
             for (int i = 0; i < size; i++) {
-                Constructor constructor = ContentPacket.class.getConstructor(int.class);
-                ContentPacket packet = (ContentPacket) constructor.newInstance(RtpPacket.MTU);
+                ContentPacket packet = new ContentPacket(RtpPacket.MTU);
                 contentPacketCache.setRepeatData(packet);
             }
         }
@@ -326,7 +322,7 @@ public class DVRH264Stream {
             NalPacket packet = attribute.popCacheData();
             MessageEnvelope envelope = new MessageEnvelope();
             envelope.setData(packet);
-            messageCourier.sendEnvelopSelf(envelope);
+            msgPostOffice.sendEnvelope(envelope);
         }
 
 

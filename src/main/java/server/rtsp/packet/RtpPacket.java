@@ -1,4 +1,4 @@
-package server.avedcoder.packet;
+package server.rtsp.packet;
 
 /**
  * RtpPacket
@@ -47,6 +47,9 @@ public class RtpPacket {
         data = packet.getData();
         data[0] = (byte) Integer.parseInt("10000000", 2);
         data[1] = (byte) 96 & 0x7F;
+        if (isFullNal) {
+            data[1] |= 0x80;
+        }
         limit = packet.getLimit();
         isFullNal = packet.isFullNal();
         time = packet.getTime();
@@ -59,7 +62,8 @@ public class RtpPacket {
 
     public void updateTimestamp(long timestamp) {
 //        setLong(data, timestamp, 4, 8);
-        setLong(data, (timestamp / 100L) * (clock / 1000L) / 10000L, 4, 8);
+//        setLong(data, (timestamp / 100L) * (clock / 1000L) / 10000L, 4, 8);
+        setLong(data, (timestamp + clock / 25) / 10000L, 4, 8);
     }
 
     /**

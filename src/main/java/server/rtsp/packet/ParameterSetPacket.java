@@ -1,4 +1,4 @@
-package server.avedcoder.packet;
+package server.rtsp.packet;
 
 /**
  * Created by dell on 9/12/2017.
