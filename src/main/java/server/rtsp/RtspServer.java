@@ -313,11 +313,12 @@ public class RtspServer extends NioServerTask {
                 }
 
                 String data = "RTP/AVP/UDP;" + transport +
-                        ";destination=" + remoteAddress +
                         ";client_port=" + clientPort +
+                        ";source=" + remoteAddress +
                         ";server_port=" + src[0] + "-" + src[1] +
-                        ";ssrc=" + Integer.toHexString(ssrc) +
-                        ";mode=play";
+                        ";ssrc=" + Integer.toHexString(ssrc)
+//                        + ";mode=play"
+                        ;
 
 
                 response = RtspProtocol.responseSetup(request.seq, data);

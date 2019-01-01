@@ -45,7 +45,7 @@ public class RtpPacket {
 
     public void setNalPacket(NalPacket packet) {
         data = packet.getData();
-        data[0] = (byte) Integer.parseInt("10000000", 2);
+        data[0] = (byte) 0x80;
         data[1] = (byte) 96 & 0x7F;
         if (isFullNal) {
             data[1] |= 0x80;
@@ -61,9 +61,9 @@ public class RtpPacket {
     }
 
     public void updateTimestamp(long timestamp) {
-//        setLong(data, timestamp, 4, 8);
+        setLong(data, timestamp / 10000L, 4, 8);
 //        setLong(data, (timestamp / 100L) * (clock / 1000L) / 10000L, 4, 8);
-        setLong(data, (timestamp + clock / 25) / 10000L, 4, 8);
+//        setLong(data, (timestamp + clock / 30) / 10000L, 4, 8);
     }
 
     /**
