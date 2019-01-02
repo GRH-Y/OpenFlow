@@ -4,6 +4,7 @@ package server.rtsp;
 import server.avedcoder.audio.EncodeAACStream;
 import server.avedcoder.video.DecodeMP4Stream;
 import server.rtsp.packet.NalPacket;
+import server.rtsp.packet.RtcpPacket;
 import server.rtsp.packet.RtpPacket;
 import server.rtsp.rtp.RtpSocket;
 import task.message.MessageCourier;
@@ -25,6 +26,12 @@ public class DataSrc {
     private List<RtpSocket> videoSet;
     private List<RtpSocket> audioSet;
 
+    private RtpPacket videoRtpPacket;
+    private RtpPacket audioRtpPacket;
+
+    private RtcpPacket videoRtcpPacket;
+    private RtcpPacket audioRtcpPacket;
+
     private MessagePostOffice postOffice;
     private MessageCourier courier;
 
@@ -40,6 +47,45 @@ public class DataSrc {
         courier.addEnvelopeServer(postOffice);
         videoSet = new ArrayList<>();
         audioSet = new ArrayList<>();
+//        videoRtpPacket = new RtpPacket();
+//        audioRtpPacket = new RtpPacket();
+//        videoRtpPacket.setClockFrequency(90000);
+//        audioRtpPacket.setClockFrequency(8000);
+//        videoRtcpPacket = new RtcpPacket(videoRtpPacket.getSSRC());
+//        audioRtcpPacket = new RtcpPacket(audioRtpPacket.getSSRC());
+    }
+
+    public void setAudioRtcpPacket(RtcpPacket audioRtcpPacket) {
+        this.audioRtcpPacket = audioRtcpPacket;
+    }
+
+    public void setVideoRtcpPacket(RtcpPacket videoRtcpPacket) {
+        this.videoRtcpPacket = videoRtcpPacket;
+    }
+
+    public void setAudioRtpPacket(RtpPacket audioRtpPacket) {
+        this.audioRtpPacket = audioRtpPacket;
+    }
+
+    public void setVideoRtpPacket(RtpPacket videoRtpPacket) {
+        this.videoRtpPacket = videoRtpPacket;
+    }
+
+
+    public RtpPacket getVideoRtpPacket() {
+        return videoRtpPacket;
+    }
+
+    public RtpPacket getAudioRtpPacket() {
+        return audioRtpPacket;
+    }
+
+    public RtcpPacket getVideoRtcpPacket() {
+        return videoRtcpPacket;
+    }
+
+    public RtcpPacket getAudioRtcpPacket() {
+        return audioRtcpPacket;
     }
 
     public void release() {
@@ -108,7 +154,7 @@ public class DataSrc {
     public void startVideoEncode() {
 //        videoThread.setMsgPostOffice(postOffice);
 //        videoThread.startEncode();
-        mp4Stream.setMsgPostOffice(postOffice,"onAudioVideo");
+        mp4Stream.setMsgPostOffice(postOffice, "onAudioVideo");
         mp4Stream.startSteam();
     }
 
@@ -149,9 +195,10 @@ public class DataSrc {
         return audioThread.getSamplingRate();
     }
 
-    private void sendData(NalPacket packet, List<RtpSocket> socketList) {
+
+    private void sendData(RtpPacket rtpPacket, List<RtpSocket> socketList) {
         RtpSocket socket = socketList.get(0);
-        RtpPacket rtpPacket = socket.sendNalPacket(packet);
+        socket.sendRtpPacket(rtpPacket);
         for (int index = 1; index < socketList.size(); index++) {
             RtpSocket tmp = socketList.get(index);
             tmp.sendRtpPacket(rtpPacket);
@@ -167,9 +214,11 @@ public class DataSrc {
         if (object instanceof NalPacket) {
             NalPacket packet = (NalPacket) envelope.getData();
             if (NalPacket.PacketType.AUDIO == packet.getPacketType()) {
-                sendData(packet,audioSet);
+                audioRtpPacket.setNalPacket(packet);
+                sendData(audioRtpPacket, audioSet);
             } else {
-                sendData(packet,videoSet);
+                videoRtpPacket.setNalPacket(packet);
+                sendData(videoRtpPacket, videoSet);
             }
             packet.setFullNal(false);
         } else if (object instanceof RtpPacket) {

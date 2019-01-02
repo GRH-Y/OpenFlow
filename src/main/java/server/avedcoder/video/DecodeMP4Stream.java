@@ -109,7 +109,7 @@ public class DecodeMP4Stream extends VideoSteam {
         IConsumerAttribute attribute = taskContainer.getAttribute();
         oldTime = System.nanoTime();
         IoUtils.readToFull(file, header);
-        taskContainer.getTaskExecutor().sleepTask(35);
+        taskContainer.getTaskExecutor().sleepTask(33);
         ts += duration;
         int nalLength = Mp4Analysis.byteToInt(header, 0);
         type = header[4] & 0x1F;

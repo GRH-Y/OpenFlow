@@ -2,12 +2,12 @@ package server.rtsp;
 
 
 import connect.network.nio.*;
+import server.rtsp.packet.RtcpPacket;
+import server.rtsp.packet.RtpPacket;
 import server.rtsp.protocol.RtspProtocol;
 import server.rtsp.rtp.RtpSocket;
-import util.IoUtils;
 import util.LogDog;
 import util.NetUtils;
-import util.ThreadAnnotation;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -201,6 +201,17 @@ public class RtspServer extends NioServerTask {
             /* ********************************* Method DESCRIBE ******************************** */
             /* ********************************************************************************** */
             if (request.method.equalsIgnoreCase("DESCRIBE")) {
+                //初始化
+                RtpPacket videoRtpPacket = new RtpPacket();
+                RtpPacket audioRtpPacket = new RtpPacket();
+                videoRtpPacket.setClockFrequency(90000);
+                audioRtpPacket.setClockFrequency(8000);
+                dataSrc.setAudioRtpPacket(audioRtpPacket);
+                dataSrc.setVideoRtpPacket(videoRtpPacket);
+                RtcpPacket videoRtcpPacket = new RtcpPacket(videoRtpPacket.getSSRC());
+                RtcpPacket audioRtcpPacket = new RtcpPacket(audioRtpPacket.getSSRC());
+                dataSrc.setVideoRtcpPacket(videoRtcpPacket);
+                dataSrc.setAudioRtcpPacket(audioRtcpPacket);
                 // 开启录制音视频设备
                 dataSrc.startVideoEncode();
                 dataSrc.startAudioEncode();
@@ -208,11 +219,11 @@ public class RtspServer extends NioServerTask {
                 videoSocket = new RtpSocket(remoteAddress, 5006, 5007);
                 videoSocket.startConnect();
 //                dataSrc.addVideoSocket(videoSocket);
-                videoSocket.setClockFrequency(90000);
+//                videoSocket.setClockFrequency(90000);
                 audioSocket = new RtpSocket(remoteAddress, 5004, 5005);
                 audioSocket.startConnect();
 //                dataSrc.addAudioSocket(audioSocket);
-                audioSocket.setClockFrequency(8000);
+//                audioSocket.setClockFrequency(8000);
 
                 StringBuilder sb = new StringBuilder();
 //                long uptime = System.currentTimeMillis();
@@ -281,7 +292,8 @@ public class RtspServer extends NioServerTask {
                     return response.getBytes();
                 }
 
-                int ssrc = trackId == 1 ? videoSocket.getSSRC() : audioSocket.getSSRC();
+//                int ssrc = trackId == 1 ? videoSocket.getSSRC() : audioSocket.getSSRC();
+                int ssrc = trackId == 1 ?  dataSrc.getVideoRtpPacket().getSSRC() : dataSrc.getAudioRtpPacket().getSSRC();
                 int src[] = trackId == 1 ? videoSocket.getLocalPorts() : audioSocket.getLocalPorts();
 
                 String transport = null;
@@ -303,14 +315,14 @@ public class RtspServer extends NioServerTask {
                     }
                 }
 
-                if (trackId == 1) {
-                    dataSrc.startVideoEncode();
-                    videoSocket.setDestination(rtpPort, rtcpPort);
-                }
-                if (trackId == 0) {
-                    dataSrc.startAudioEncode();
-                    audioSocket.setDestination(rtpPort, rtcpPort);
-                }
+//                if (trackId == 1) {
+//                    dataSrc.startVideoEncode();
+//                    videoSocket.setDestination(rtpPort, rtcpPort);
+//                }
+//                if (trackId == 0) {
+//                    dataSrc.startAudioEncode();
+//                    audioSocket.setDestination(rtpPort, rtcpPort);
+//                }
 
                 String data = "RTP/AVP/UDP;" + transport +
                         ";client_port=" + clientPort +
@@ -330,8 +342,8 @@ public class RtspServer extends NioServerTask {
             else if (request.method.equalsIgnoreCase("PLAY")) {
                 dataSrc.addVideoSocket(videoSocket);
                 dataSrc.addAudioSocket(audioSocket);
-                audioSocket.continueConnect(true);
-                videoSocket.continueConnect(true);
+//                audioSocket.continueConnect(true);
+//                videoSocket.continueConnect(true);
                 response = RtspProtocol.responsePlay(request.seq, localAddress, localPort, true, true);
             }
 
@@ -339,8 +351,8 @@ public class RtspServer extends NioServerTask {
             /* ********************************** Method PAUSE ********************************** */
             /* ********************************************************************************** */
             else if (request.method.equalsIgnoreCase("PAUSE")) {
-                audioSocket.pauseConnect();
-                videoSocket.pauseConnect();
+//                audioSocket.pauseConnect();
+//                videoSocket.pauseConnect();
                 response = RtspProtocol.responsePause(request.seq);
             }
 
