@@ -1,9 +1,10 @@
 package server.rtsp;
 
 
-import server.avedcoder.audio.EncodeAACStream;
-import server.avedcoder.video.DecodeMP4Stream;
+import server.avdecode.audio.DecodeMP4AACStream;
+import server.avdecode.video.DecodeMP4H264Stream;
 import server.rtsp.packet.NalPacket;
+import server.rtsp.packet.PacketType;
 import server.rtsp.packet.RtcpPacket;
 import server.rtsp.packet.RtpPacket;
 import server.rtsp.rtp.RtpSocket;
@@ -20,8 +21,8 @@ import java.util.List;
  */
 
 public class DataSrc {
-    private DecodeMP4Stream mp4Stream = null;
-    private EncodeAACStream audioThread = null;
+    private DecodeMP4H264Stream mp4Stream = null;
+    private DecodeMP4AACStream audioThread = null;
 
     private List<RtpSocket> videoSet;
     private List<RtpSocket> audioSet;
@@ -139,7 +140,7 @@ public class DataSrc {
 //        }
         if (mp4Stream == null) {
             try {
-                mp4Stream = new DecodeMP4Stream(filePath);
+                mp4Stream = new DecodeMP4H264Stream(filePath);
             } catch (Exception e) {
                 e.printStackTrace();
                 mp4Stream = null;
@@ -148,7 +149,7 @@ public class DataSrc {
     }
 
     public void initAudioEncode() {
-        audioThread = new EncodeAACStream(filePath);
+        audioThread = new DecodeMP4AACStream(filePath);
     }
 
     public void startVideoEncode() {
@@ -213,7 +214,7 @@ public class DataSrc {
         Object object = envelope.getData();
         if (object instanceof NalPacket) {
             NalPacket packet = (NalPacket) envelope.getData();
-            if (NalPacket.PacketType.AUDIO == packet.getPacketType()) {
+            if (PacketType.AUDIO == packet.getPacketType()) {
                 audioRtpPacket.setNalPacket(packet);
                 sendData(audioRtpPacket, audioSet);
             } else {
@@ -223,7 +224,7 @@ public class DataSrc {
             packet.setFullNal(false);
         } else if (object instanceof RtpPacket) {
             RtpPacket packet = (RtpPacket) envelope.getData();
-            if (NalPacket.PacketType.AUDIO == packet.getPacketType()) {
+            if (PacketType.AUDIO == packet.getPacketType()) {
                 for (RtpSocket audio : audioSet) {
                     audio.sendRtpPacket(packet);
                 }

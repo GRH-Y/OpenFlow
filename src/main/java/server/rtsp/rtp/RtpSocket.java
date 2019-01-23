@@ -1,8 +1,8 @@
 package server.rtsp.rtp;
 
 
-import connect.network.udp.UdpClientFactory;
 import connect.network.udp.UdpClientTask;
+import connect.network.udp.UdpFactory;
 import connect.network.udp.UdpSender;
 import server.rtsp.packet.RtpPacket;
 import server.rtsp.rtcp.RtcpReportSocket;
@@ -35,19 +35,13 @@ public class RtpSocket extends UdpClientTask {
     public int[] getLocalPorts() {
         return new int[]{
                 getLocalPort(),
-//                12345
                 reportSocket.getLocalPort()
         };
     }
 
-    public void setDestination(String ip, int port, int rtcpPort) {
-//        rtpSocket.refreshDestAddress(ip, port);
-//        reportSocket.setDestination(ip, rtcpPort);
-    }
-
-    public void setDestination(int port, int rtcpPort) {
-//        rtpSocket.refreshDestAddress(port);
-//        reportSocket.setDestination(rtcpPort);
+    public void setDestination(int rtpPort, int rtcpPort) {
+        setAddress(getHost(),rtpPort);
+        reportSocket.setAddress(reportSocket.getHost(),rtcpPort);
     }
 
     public void sendRtpPacket(RtpPacket packet) {
@@ -62,13 +56,13 @@ public class RtpSocket extends UdpClientTask {
 
 
     public void startConnect() {
-        UdpClientFactory.getFactory().open();
-        UdpClientFactory.getFactory().addTask(this);
+        UdpFactory.getFactory().open();
+        UdpFactory.getFactory().addTask(this);
         reportSocket.startConnect();
     }
 
     public void stopConnect() {
-        UdpClientFactory.getFactory().removeTask(this);
+        UdpFactory.getFactory().removeTask(this);
         reportSocket.stopConnect();
     }
 

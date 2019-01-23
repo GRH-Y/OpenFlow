@@ -1,21 +1,31 @@
 package server.rtsp.packet;
 
 /**
- * NalPacket
+ * NalPacket （非关键帧数据）
  * Created by dell on 9/12/2017.
  */
-
 public class NalPacket {
-    private byte[] data ;//nal数据
+    /**
+     * nal数据
+     */
+    private byte[] data;
+    /**
+     * nal实际大小
+     */
+    private int limit;
+    /**
+     * 数据类型
+     */
     private PacketType packetType = PacketType.VIDEO;
-    private int limit = 0;//该nal实际大小
+    /**
+     * 是否是最后一帧数据
+     */
     private boolean isFullNal = false;
-    private long time = 0;//该nal产生的时间
+    /**
+     * 该nal产生的时间
+     */
+    private long time = 0;
 //    private byte header = 0;
-
-    public enum PacketType {
-        AUDIO, VIDEO
-    }
 
     public NalPacket(int packetSize) {
         data = new byte[packetSize];
@@ -61,10 +71,6 @@ public class NalPacket {
 
     public PacketType getPacketType() {
         return packetType;
-    }
-
-    public void init(byte[] sps, byte[] pps) {
-        setStreamParameters(sps, pps);
     }
 
     private void setStreamParameters(byte[] sps, byte[] pps) {

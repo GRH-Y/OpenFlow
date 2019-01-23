@@ -18,14 +18,14 @@ public class RtpPacket {
     private int ssrc = new Random().nextInt();
     private boolean isFullNal = false;
 
-    private NalPacket.PacketType packetType = NalPacket.PacketType.VIDEO;
+    private PacketType packetType = PacketType.VIDEO;
 
 
-    public void setPacketType(NalPacket.PacketType type) {
+    public void setPacketType(PacketType type) {
         this.packetType = type;
     }
 
-    public NalPacket.PacketType getPacketType() {
+    public PacketType getPacketType() {
         return packetType;
     }
 

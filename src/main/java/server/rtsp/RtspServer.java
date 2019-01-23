@@ -15,8 +15,6 @@ import java.net.InetSocketAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.nio.channels.SocketChannel;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -29,9 +27,9 @@ import java.util.regex.Pattern;
 public class RtspServer extends NioServerTask {
     private DataSrc dataSrc = null;
     /**
-     * 链接的客户端
+     * 链接的客户端数量
      */
-    private Queue<Client> connectCache = new ConcurrentLinkedQueue<>();
+    private int connectNumber = 0;
 
     public RtspServer(int port) {
         String ip = NetUtils.getLocalIp("wlan0");
@@ -60,14 +58,14 @@ public class RtspServer extends NioServerTask {
         NioClientFactory factory = NioClientFactory.getFactory();
         factory.open();
         factory.addTask(client);
-        connectCache.add(client);
+        connectNumber++;
     }
 
 
     @Override
     protected void onOpenServerChannel(boolean isSuccess) {
         if (isSuccess) {
-            LogDog.v("==> RtspServer running, server address = " + getServerHost() + " client connect number = " + connectCache.size());
+            LogDog.v("==> RtspServer running, server address = " + getServerHost() + " client connect number = " + connectNumber);
 //            dataSrc.startVideoEncode();
 //            dataSrc.startAudioEncode();
         }
@@ -82,9 +80,8 @@ public class RtspServer extends NioServerTask {
         NioClientFactory.getFactory().close();
     }
 
-    private void notifyStop(NioClientTask connect) {
-        connectCache.remove(connect);
-        if (connectCache.size() == 0) {
+    private void notifyStop() {
+        if (connectNumber == 0) {
             LogDog.w("==>  当前没有客户端连接，停止音视频线程!");
             dataSrc.stopAudioEncode();
             dataSrc.stopVideoEncode();
@@ -293,7 +290,7 @@ public class RtspServer extends NioServerTask {
                 }
 
 //                int ssrc = trackId == 1 ? videoSocket.getSSRC() : audioSocket.getSSRC();
-                int ssrc = trackId == 1 ?  dataSrc.getVideoRtpPacket().getSSRC() : dataSrc.getAudioRtpPacket().getSSRC();
+                int ssrc = trackId == 1 ? dataSrc.getVideoRtpPacket().getSSRC() : dataSrc.getAudioRtpPacket().getSSRC();
                 int src[] = trackId == 1 ? videoSocket.getLocalPorts() : audioSocket.getLocalPorts();
 
                 String transport = null;
@@ -315,14 +312,14 @@ public class RtspServer extends NioServerTask {
                     }
                 }
 
-//                if (trackId == 1) {
+                if (trackId == 1) {
 //                    dataSrc.startVideoEncode();
-//                    videoSocket.setDestination(rtpPort, rtcpPort);
-//                }
-//                if (trackId == 0) {
+                    videoSocket.setDestination(rtpPort, rtcpPort);
+                }
+                if (trackId == 0) {
 //                    dataSrc.startAudioEncode();
-//                    audioSocket.setDestination(rtpPort, rtcpPort);
-//                }
+                    audioSocket.setDestination(rtpPort, rtcpPort);
+                }
 
                 String data = "RTP/AVP/UDP;" + transport +
                         ";client_port=" + clientPort +
@@ -360,8 +357,7 @@ public class RtspServer extends NioServerTask {
             /* ********************************* Method TEARDOWN ******************************** */
             /* ********************************************************************************** */
             else if (request.method.equalsIgnoreCase("TEARDOWN")) {
-                NioClientFactory factory = NioClientFactory.getFactory();
-                factory.removeTask(this);
+                NioClientFactory.getFactory().removeTask(this);
                 response = RtspProtocol.responseTeardown(request.seq);
             }
             /* ********************************************************************************** */
@@ -389,7 +385,7 @@ public class RtspServer extends NioServerTask {
             if (videoSocket != null) {
                 videoSocket.stopConnect();
             }
-            notifyStop(this);
+            notifyStop();
             LogDog.w("==> RtspServer 断开与" + remoteAddress + "客户端的链接...");
         }
 

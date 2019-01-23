@@ -19,8 +19,8 @@
 package server.rtsp.rtcp;
 
 
-import connect.network.udp.UdpClientFactory;
 import connect.network.udp.UdpClientTask;
+import connect.network.udp.UdpFactory;
 import connect.network.udp.UdpSender;
 import server.rtsp.packet.RtcpPacket;
 
@@ -37,12 +37,12 @@ public class RtcpReportSocket extends UdpClientTask {
     }
 
     public void startConnect() {
-        UdpClientFactory.getFactory().open();
-        UdpClientFactory.getFactory().addTask(this);
+        UdpFactory.getFactory().open();
+        UdpFactory.getFactory().addTask(this);
     }
 
     public void stopConnect() {
-        UdpClientFactory.getFactory().removeTask(this);
+        UdpFactory.getFactory().removeTask(this);
     }
 
     public void sendRtcpData(RtcpPacket packet, int length, long rtpts) {

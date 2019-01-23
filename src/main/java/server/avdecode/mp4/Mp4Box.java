@@ -1,9 +1,9 @@
-package server.avedcoder.mp4;
-
-
+package server.avdecode.mp4;
 
 
 import util.LogDog;
+import util.StringUtils;
+import util.TypeConversion;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -20,7 +20,7 @@ public class Mp4Box {
     private TrakBox currentTrakBox = null;
 
     private RandomAccessFile mp4File;
-    private byte[] buffer = new byte[8];
+    private byte[] tag = new byte[8];
 
     public Mp4Box(String filePath) {
         if (filePath == null || filePath.length() == 0) {
@@ -48,42 +48,6 @@ public class Mp4Box {
         return true;
     }
 
-    private int byteToInt(byte[] src, int offset) {
-        int value;
-        value = (((src[offset] & 0xFF) << 24)
-                | ((src[offset + 1] & 0xFF) << 16)
-                | ((src[offset + 2] & 0xFF) << 8)
-                | (src[offset + 3] & 0xFF));
-        return value;
-    }
-
-    private long byteToLong(byte[] byteNum) {
-        long num = 0;
-        for (int ix = 0; ix < 8; ++ix) {
-            num <<= 8;
-            num |= (byteNum[ix] & 0xff);
-        }
-        return num;
-    }
-
-    private long byteToLong(byte[] byteNum, int start, int end) {
-        long num = start;
-        for (int ix = 0; ix < end - start; ++ix) {
-            num <<= end - start;
-            num |= (byteNum[ix] & 0xff);
-        }
-        return num;
-    }
-
-    private String byteToHexStr(byte[] b) {
-        StringBuilder sb = new StringBuilder("");
-        for (int n = 0; n < b.length; n++) {
-            String tmp = Integer.toHexString(b[n] & 0xFF);
-            sb.append((tmp.length() == 1) ? "0" + tmp : tmp);
-            sb.append(" ");
-        }
-        return sb.toString().toUpperCase().trim();
-    }
 
     /**
      * 分析MP4文件的所有box信息
@@ -93,24 +57,26 @@ public class Mp4Box {
     public void analysis() throws Exception {
         mp4File.seek(0);
         while (mp4File.getFilePointer() < mp4File.length()) {
-            int ret = mp4File.read(buffer);
+            int ret = mp4File.read(tag);
             if (ret < 1) {
                 throw new IOException("file is end or stream has error  !");
             }
-            if (validBoxName(buffer)) {
-                if (buffer[3] == 1) {
+            if (validBoxName(tag)) {
+                if (tag[3] == 1) {
                     // 64 bits atom size
                 } else {
                     // 32 bits atom size
-                    long length = byteToInt(buffer, 0);
-                    String name = new String(buffer, 4, 4);
+                    long length = TypeConversion.byteToInt(tag, 0);
+                    String name = new String(tag, 4, 4);
+                    LogDog.d("==> boxName = " + name + " length = " + length);
                     saveBox(name, length);
                 }
             }
         }
     }
 
-    public String transForLongToDate(Long millSec) {
+
+    private String transForLongToDate(Long millSec) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Date date = new Date(millSec);
         return sdf.format(date);
@@ -219,13 +185,13 @@ public class Mp4Box {
                     stsdBox.parseSub();
                 }
                 break;
-            case Avc1Box.BOX_NAME:
-                if (currentTrakBox != null) {
-                    Avc1Box avc1Box = new Avc1Box(length);
-                    currentTrakBox.mdiaBox.minfBox.stblBox.stsdBox.avc1Box = avc1Box;
-                    avc1Box.parseSub();
-                }
-                break;
+//            case Avc1Box.BOX_NAME:
+//                if (currentTrakBox != null) {
+//                    Avc1Box avc1Box = new Avc1Box(length);
+//                    currentTrakBox.mdiaBox.minfBox.stblBox.stsdBox.avc1Box = avc1Box;
+//                    avc1Box.parseSub();
+//                }
+//                break;
             case AvcCBox.BOX_NAME:
                 if (currentTrakBox != null) {
                     AvcCBox avcCBox = new AvcCBox(length);
@@ -276,7 +242,7 @@ public class Mp4Box {
                 }
                 break;
             default:
-                skipBox(length);
+                skipBox(length - 8);
                 break;
         }
     }
@@ -285,12 +251,12 @@ public class Mp4Box {
         //当前的box不对应,跳过这个box
         if (length > Integer.MAX_VALUE) {
             while (length > 0) {
-                int tmp = length > Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) (length - buffer.length);
+                int tmp = length > Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) (length - tag.length);
                 mp4File.skipBytes(tmp);
                 length -= tmp;
             }
         } else {
-            mp4File.skipBytes((int) length - buffer.length);
+            mp4File.skipBytes((int) length - tag.length);
         }
     }
 
@@ -314,7 +280,7 @@ public class Mp4Box {
     public void release() {
         moovBox.release();
         ftypBox.release();
-        buffer = null;
+        tag = null;
         if (mp4File != null) {
             try {
                 mp4File.close();
@@ -326,14 +292,24 @@ public class Mp4Box {
     }
 
     private abstract class Box {
-        public byte[] srcData = null;
+        protected byte[] srcData;
 
-        public Box(boolean isHasSrcData, long length) throws IOException {
-            if (isHasSrcData) {
-                srcData = new byte[(int) length - buffer.length];
+        public Box(boolean isHasData, long length) throws IOException {
+            if (isHasData) {
+                srcData = new byte[(int) length - tag.length];
                 mp4File.read(srcData);
-                LogDog.i("==> srcData " + getClass().getName() + " = " + byteToHexStr(srcData));
+                LogDog.i("==> srcData " + getClass().getName() + " = " + StringUtils.byteToHexStr(srcData));
             }
+        }
+
+        protected int[] parseArray() {
+            int[] array = new int[srcData.length / 4];
+            int count = 0;
+            for (int index = 0; index < srcData.length; index += 4) {
+                array[count] = TypeConversion.byteToInt(srcData, index);
+                count++;
+            }
+            return array;
         }
 
         abstract void parseSub() throws Exception;
@@ -358,9 +334,9 @@ public class Mp4Box {
         @Override
         void parseSub() throws Exception {
             int index = 0;
-            majorBrand = new String(srcData, index, index + 4);
+            majorBrand = new String(srcData, index, 4);
             index += 4;
-            minorVersion = String.valueOf(byteToInt(srcData, index));
+            minorVersion = String.valueOf(TypeConversion.byteToInt(srcData, index));
             index += 4;
             compatibleBrands = new String(srcData, index, srcData.length - index);
             LogDog.d("==> majorBrand = " + majorBrand);
@@ -427,13 +403,13 @@ public class Mp4Box {
 
         @Override
         void parseSub() throws Exception {
-            long time = byteToLong(srcData);
+            long time = TypeConversion.byteToLong(srcData);
             creationTime = transForLongToDate(time);
-            long mtime = byteToLong(srcData, 8, 12);
+            long mtime = TypeConversion.byteToLong(srcData, 8, 12);
             modificationTime = transForLongToDate(mtime);
-            timeScale = byteToInt(srcData, 12);
-            duration = byteToInt(srcData, 16);
-            nextTrackId = byteToInt(srcData, srcData.length - 4);
+            timeScale = TypeConversion.byteToInt(srcData, 12);
+            duration = TypeConversion.byteToInt(srcData, 16);
+            nextTrackId = TypeConversion.byteToInt(srcData, srcData.length - 4);
         }
     }
 
@@ -667,12 +643,12 @@ public class Mp4Box {
         public Avc1Box avc1Box = null;
 
         public StsdBox(long length) throws IOException {
-            super(true, length);
+            super(false, length);
         }
 
         @Override
         void parseSub() throws Exception {
-//            avc1Box = new Avc1Box();
+//            avc1Box = new Avc1Box(srcData.length);
 //            avc1Box.parseSub();
         }
     }
@@ -682,7 +658,8 @@ public class Mp4Box {
         public AvcCBox avcCBox = null;
 
         public Avc1Box(long length) throws IOException {
-            super(true, length);
+            super(false, length);
+//            srcData = data;
         }
 
         @Override
@@ -704,8 +681,15 @@ public class Mp4Box {
         }
     }
 
+    /**
+     * “stts”存储了sample的duration，描述了sample时序的映射方法，我们通过它可以找到任何时间的sample。
+     * “stts”可以包含一个压缩的表来映射时间和sample序号，用其他的表来提供每个sample的长度和指针。
+     * 表中每个条目提供了在同一个时间偏移量里面连续的sample序号，以及samples的偏移量。
+     * 递增这些偏移量，就可以建立一个完整的time to sample表。
+     */
     public class SttsBox extends Box {
         public final static String BOX_NAME = "stts";
+        public int[] sttsArray;
 
         public SttsBox(long length) throws IOException {
             super(true, length);
@@ -713,6 +697,7 @@ public class Mp4Box {
 
         @Override
         void parseSub() throws Exception {
+            sttsArray = parseArray();
         }
     }
 
@@ -728,8 +713,14 @@ public class Mp4Box {
         }
     }
 
+    /**
+     * “stss”确定media中的关键帧。对于压缩媒体数据，关键帧是一系列压缩序列的开始帧，其解压缩时不依赖以前的帧，而后续帧的解压缩将依赖于这个关键帧。
+     * “stss”可以非常紧凑的标记媒体内的随机存取点，它包含一个sample序号表，表内的每一项严格按照sample的序号排列，说明了媒体中的哪一个sample是关键帧。
+     * 如果此表不存在，说明每一个sample都是一个关键帧，是一个随机存取点。
+     */
     public class StssBox extends Box {
         public final static String BOX_NAME = "stss";
+        public int[] stssArray;
 
         public StssBox(long length) throws IOException {
             super(true, length);
@@ -737,11 +728,17 @@ public class Mp4Box {
 
         @Override
         void parseSub() throws Exception {
+            stssArray = parseArray();
         }
     }
 
+    /**
+     * 用chunk组织sample可以方便优化数据获取，一个thunk包含一个或多个sample。
+     * “stsc”中用一个表描述了sample与chunk的映射关系，查看这张表就可以找到包含指定sample的thunk，从而找到这个sample。
+     */
     public class StscBox extends Box {
         public final static String BOX_NAME = "stsc";
+        public int[] stscArray;
 
         public StscBox(long length) throws IOException {
             super(true, length);
@@ -749,11 +746,16 @@ public class Mp4Box {
 
         @Override
         void parseSub() throws Exception {
+            stscArray = parseArray();
         }
     }
 
+    /**
+     * “stsz” 定义了每个sample的大小，包含了媒体中全部sample的数目和一张给出每个sample大小的表。这个box相对来说体积是比较大的。
+     */
     public class StszBox extends Box {
         public final static String BOX_NAME = "stsz";
+        public int[] stszArray;
 
         public StszBox(long length) throws IOException {
             super(true, length);
@@ -761,11 +763,18 @@ public class Mp4Box {
 
         @Override
         void parseSub() throws Exception {
+            stszArray = parseArray();
         }
     }
 
+    /**
+     * “stco”定义了每个thunk在媒体流中的位置。
+     * 位置有两种可能，32位的和64位的，后者对非常大的电影很有用。在一个表中只会有一种可能，这个位置是在整个文件中的，而不是在任何box中的，
+     * 这样做就可以直接在文件中找到媒体数据，而不用解释box。需要注意的是一旦前面的box有了任何改变，这张表都要重新建立，因为位置信息已经改变了。
+     */
     public class StcoBox extends Box {
         public final static String BOX_NAME = "stco";
+        public int[] stcoArray;
 
         public StcoBox(long length) throws IOException {
             super(true, length);
@@ -773,6 +782,7 @@ public class Mp4Box {
 
         @Override
         void parseSub() throws Exception {
+            stcoArray = parseArray();
         }
     }
 

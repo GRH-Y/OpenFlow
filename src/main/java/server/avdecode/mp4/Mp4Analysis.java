@@ -1,4 +1,4 @@
-package server.avedcoder.mp4;
+package server.avdecode.mp4;
 
 
 import java.io.File;

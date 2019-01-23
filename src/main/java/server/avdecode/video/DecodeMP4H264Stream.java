@@ -1,9 +1,8 @@
-package server.avedcoder.video;
+package server.avdecode.video;
 
 
-import server.avedcoder.mp4.Mp4Analysis;
+import server.avdecode.mp4.Mp4Analysis;
 import server.rtsp.packet.ContentPacket;
-import server.rtsp.packet.ParameterSetPacket;
 import server.rtsp.packet.RtpPacket;
 import task.executor.joggle.IConsumerAttribute;
 import util.IoUtils;
@@ -13,19 +12,19 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.List;
 
-public class DecodeMP4Stream extends VideoSteam {
+public class DecodeMP4H264Stream extends VideoSteam {
 
     private String path;
     private RandomAccessFile file = null;
     private int[] arrayStco = null;
     private List<Mp4Analysis.Stsc> stscList = null;
-    private volatile ParameterSetPacket parameterSetPacket = null;
+
 
     private long oldTime = 0, duration = 0, ts = 0;
     private byte[] header = new byte[5];
-    private int type, maxLength = RtpPacket.MTU - RtpPacket.RTP_HEADER_LENGTH - 2;
+    private int type;
 
-    public DecodeMP4Stream(String path) {
+    public DecodeMP4H264Stream(String path) {
         this.path = path;
     }
 
@@ -75,12 +74,10 @@ public class DecodeMP4Stream extends VideoSteam {
 
 
     @Override
-    protected boolean onBeginInit() {
-        LogDog.w("==>DecodeMP4Stream startTask ing ....");
+    protected boolean onSteamBeginInit() {
+        LogDog.w("==>DecodeMP4H264Stream startTask ing ....");
         try {
             initFile();
-            parameterSetPacket = new ParameterSetPacket(sps, pps, RtpPacket.RTP_HEADER_LENGTH);
-            parameterSetPacket.setFullNal(true);
         } catch (Exception e) {
             e.printStackTrace();
             return false;
@@ -89,16 +86,16 @@ public class DecodeMP4Stream extends VideoSteam {
     }
 
     @Override
-    protected void onEndInit() {
+    protected void onSteamEndInit() {
         if (!steamTrigger) {
-            LogDog.d("==>DecodeMP4Stream 等待 RTSP播放指令!");
+            LogDog.d("==>DecodeMP4H264Stream 等待 RTSP播放指令!");
             taskContainer.getTaskExecutor().waitTask(0);
-            LogDog.d("==>DecodeMP4Stream 收到 RTSP播放指令!");
+            LogDog.d("==>DecodeMP4H264Stream 收到 RTSP播放指令!");
         }
     }
 
     @Override
-    protected void onCreateNalData() {
+    protected void onSteamCreateNalData() {
         getFrame();
     }
 
@@ -113,7 +110,7 @@ public class DecodeMP4Stream extends VideoSteam {
         ts += duration;
         int nalLength = Mp4Analysis.byteToInt(header, 0);
         type = header[4] & 0x1F;
-        LogDog.v("==>DecodeMP4Stream type = " + type + " length = " + (nalLength + 4));
+        LogDog.v("==>DecodeMP4H264Stream type = " + type + " length = " + (nalLength + 4));
 
 
         //关键帧
@@ -127,7 +124,7 @@ public class DecodeMP4Stream extends VideoSteam {
         }
 
         //type = 1(非关键帧)
-        if (nalLength <= maxLength) {
+        if (nalLength <= nalMaxLength) {
             ContentPacket contentPacket = contentPacketCache.getRepeatData();
             if (contentPacket == null) {
                 return false;
@@ -169,7 +166,7 @@ public class DecodeMP4Stream extends VideoSteam {
                 data[RtpPacket.RTP_HEADER_LENGTH] = header[0];
                 data[RtpPacket.RTP_HEADER_LENGTH + 1] = header[1];
 
-                int len = nalLength - sum > maxLength ? maxLength : nalLength - sum;
+                int len = nalLength - sum > nalMaxLength ? nalMaxLength : nalLength - sum;
                 int ret = IoUtils.readToFull(file, data, RtpPacket.RTP_HEADER_LENGTH + 2, len);
                 if (ret == IoUtils.FAIL) {
                     stopSteam();
@@ -199,8 +196,8 @@ public class DecodeMP4Stream extends VideoSteam {
 
 
     @Override
-    protected void onDestroy() {
-        LogDog.w("==>DecodeMP4Stream stopTask ing ....");
+    protected void onSteamDestroy() {
+        LogDog.w("==>DecodeMP4H264Stream stopTask ing ....");
         try {
             file.close();
             file = null;
