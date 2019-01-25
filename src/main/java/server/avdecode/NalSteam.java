@@ -26,7 +26,7 @@ public abstract class NalSteam {
         taskContainer.setAttribute(new ConsumerQueueAttribute<>());
     }
 
-    public void setVideoOutSwitch(boolean trigger) {
+    public void setSteamOutSwitch(boolean trigger) {
         this.steamTrigger = trigger;
     }
 

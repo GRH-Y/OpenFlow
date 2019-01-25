@@ -4,8 +4,8 @@ package server.avdecode.video;
 import server.avdecode.mp4.Mp4Analysis;
 import server.avdecode.mp4.NalAnalysis;
 import server.camera.H264Preview;
-import server.rtsp.packet.ContentPacket;
 import server.rtsp.packet.NalPacket;
+import server.rtsp.packet.OtherFramePacket;
 import server.rtsp.packet.RtpPacket;
 import task.executor.TaskContainer;
 import task.executor.joggle.IConsumerAttribute;
@@ -126,9 +126,9 @@ public class DVRH264Stream extends VideoSteam {
 
 
         if (nal.length <= nalMaxLength) {
-            ContentPacket contentPacket = contentPacketCache.getRepeatData();
+            OtherFramePacket contentPacket = otherFramePacketCache.getRepeatData();
             if (contentPacket == null) {
-                contentPacket = new ContentPacket(RtpPacket.MTU);
+                contentPacket = new OtherFramePacket(RtpPacket.MTU);
             }
             contentPacket.setTime(ts);
             byte[] data = contentPacket.getData();
@@ -142,7 +142,7 @@ public class DVRH264Stream extends VideoSteam {
                 attribute.pushToCache(contentPacket);
                 resumeTask();
             }
-            contentPacketCache.setRepeatData(contentPacket);
+            otherFramePacketCache.setRepeatData(contentPacket);
         } else {
             header[1] = (byte) (header[4] & 0x1F);  // FU header type
             header[1] |= 0x80; // Start bit
@@ -150,9 +150,9 @@ public class DVRH264Stream extends VideoSteam {
             header[0] |= 28;
 
             while (skipLength < nal.length) {
-                ContentPacket contentPacket = contentPacketCache.getRepeatData();
+                OtherFramePacket contentPacket = otherFramePacketCache.getRepeatData();
                 if (contentPacket == null) {
-                    contentPacket = new ContentPacket(RtpPacket.MTU);
+                    contentPacket = new OtherFramePacket(RtpPacket.MTU);
                 }
                 byte[] data = contentPacket.getData();
                 contentPacket.setFullNal(false);
@@ -164,7 +164,7 @@ public class DVRH264Stream extends VideoSteam {
                 System.arraycopy(nal, skipLength, data, RtpPacket.RTP_HEADER_LENGTH + 2, len);
 //                    LogDog.i("==> long rtp = " + Utils.bytes2HexString(data));
                 skipLength += len;
-                // Last parameterSetPacket before next NAL
+                // Last keyFramePacket before next NAL
                 if (nal.length == skipLength) {
                     // End bit on
                     contentPacket.setFullNal(true);
@@ -176,7 +176,7 @@ public class DVRH264Stream extends VideoSteam {
                     attribute.pushToCache(contentPacket);
                     resumeTask();
                 }
-                contentPacketCache.setRepeatData(contentPacket);
+                otherFramePacketCache.setRepeatData(contentPacket);
                 // Switch start bit
                 header[1] = (byte) (header[1] & 0x7F);
             }
@@ -214,7 +214,7 @@ public class DVRH264Stream extends VideoSteam {
 //
 //
 //            if (nal.length <= maxLength) {
-//                ContentPacket contentPacket = new ContentPacket(RtpPacket.MTU);
+//                OtherFramePacket contentPacket = new OtherFramePacket(RtpPacket.MTU);
 //                contentPacket.setTime(ts);
 //                byte[] data = contentPacket.getData();
 //                data[RtpPacket.RTP_HEADER_LENGTH] = header[4];
@@ -235,7 +235,7 @@ public class DVRH264Stream extends VideoSteam {
 //                header[0] |= 28;
 //
 //                while (skipLength < nal.length) {
-//                    ContentPacket contentPacket = new ContentPacket(RtpPacket.MTU);
+//                    OtherFramePacket contentPacket = new OtherFramePacket(RtpPacket.MTU);
 //                    byte[] data = contentPacket.getData();
 //                    contentPacket.setFullNal(false);
 //
@@ -246,7 +246,7 @@ public class DVRH264Stream extends VideoSteam {
 //                    System.arraycopy(nal, skipLength, data, RtpPacket.RTP_HEADER_LENGTH + 2, len);
 ////                    LogDog.i("==> key rtp = " + Utils.bytes2HexString(data));
 //                    skipLength += len;
-//                    // Last parameterSetPacket before next NAL
+//                    // Last keyFramePacket before next NAL
 //                    if (nal.length == skipLength) {
 //                        // End bit on
 //                        contentPacket.setFullNal(true);

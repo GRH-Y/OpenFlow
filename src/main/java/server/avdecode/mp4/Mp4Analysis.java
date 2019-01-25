@@ -519,15 +519,30 @@ public class Mp4Analysis {
         return arrayStsc;
     }
 
+//    public List<Stsc> getListStsc() {
+//        List<Stsc> stscList = null;
+//        if (arrayStsc != null) {
+//            stscList = new ArrayList<>(arrayStsc.length / 3);
+//            for (int index = 0; index < arrayStsc.length;) {
+//                Stsc stsc = new Stsc();
+//                stsc.firstChunk = arrayStsc[index++];
+//                stsc.SamplesPerChunk = arrayStsc[index++];
+//                stsc.SampleDescriptionIndex = arrayStsc[index++];
+//                stscList.add(stsc);
+//            }
+//        }
+//        return stscList;
+//    }
+
     public List<Stsc> getListStsc() {
         List<Stsc> stscList = null;
         if (arrayStsc != null) {
             stscList = new ArrayList<>(arrayStsc.length / 3);
-            for (int index = 0; index < arrayStsc.length;) {
+            for (int index = 0; index < arrayStsc.length; index++) {
                 Stsc stsc = new Stsc();
-                stsc.firstChunk = arrayStsc[index++];
+                stsc.firstChunk = --arrayStsc[index++];
                 stsc.SamplesPerChunk = arrayStsc[index++];
-                stsc.SampleDescriptionIndex = arrayStsc[index++];
+                stsc.SampleDescriptionIndex = arrayStsc[index];
                 stscList.add(stsc);
             }
         }

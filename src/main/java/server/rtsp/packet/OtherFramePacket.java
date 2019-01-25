@@ -5,8 +5,8 @@ package server.rtsp.packet;
  *
  * @author yyz
  */
-public class ContentPacket extends NalPacket {
-    public ContentPacket(int packetSize) {
+public class OtherFramePacket extends NalPacket {
+    public OtherFramePacket(int packetSize) {
         super(packetSize);
     }
 }

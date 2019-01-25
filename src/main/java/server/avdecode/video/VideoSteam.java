@@ -2,8 +2,8 @@ package server.avdecode.video;
 
 import server.avdecode.NalSteam;
 import server.avdecode.mp4.Mp4Analysis;
-import server.rtsp.packet.ContentPacket;
-import server.rtsp.packet.ParameterSetPacket;
+import server.rtsp.packet.KeyFramePacket;
+import server.rtsp.packet.OtherFramePacket;
 import server.rtsp.packet.RtpPacket;
 import util.MultiplexCache;
 
@@ -12,8 +12,8 @@ import util.MultiplexCache;
  */
 public abstract class VideoSteam extends NalSteam {
 
-    protected ParameterSetPacket parameterSetPacket = null;
-    protected MultiplexCache<ContentPacket> contentPacketCache = null;
+    protected KeyFramePacket keyFramePacket = null;
+    protected MultiplexCache<OtherFramePacket> otherFramePacketCache = null;
 
     protected byte[] sps = null;
     protected byte[] pps = null;
@@ -38,14 +38,14 @@ public abstract class VideoSteam extends NalSteam {
 
 
     private void initCache() {
-        parameterSetPacket = new ParameterSetPacket(sps, pps, RtpPacket.RTP_HEADER_LENGTH);
-        parameterSetPacket.setFullNal(true);
+        keyFramePacket = new KeyFramePacket(sps, pps, RtpPacket.RTP_HEADER_LENGTH);
+        keyFramePacket.setFullNal(true);
 
         int size = 100;
-        contentPacketCache = new MultiplexCache<>(size);
+        otherFramePacketCache = new MultiplexCache<>(size);
         for (int i = 0; i < size; i++) {
-            ContentPacket packet = new ContentPacket(RtpPacket.MTU);
-            contentPacketCache.setRepeatData(packet);
+            OtherFramePacket packet = new OtherFramePacket(RtpPacket.MTU);
+            otherFramePacketCache.setRepeatData(packet);
         }
     }
 
@@ -56,9 +56,9 @@ public abstract class VideoSteam extends NalSteam {
 
     @Override
     protected void onSteamDestroy() {
-        if (contentPacketCache != null) {
-            contentPacketCache.release();
-            contentPacketCache = null;
+        if (otherFramePacketCache != null) {
+            otherFramePacketCache.release();
+            otherFramePacketCache = null;
         }
     }
 

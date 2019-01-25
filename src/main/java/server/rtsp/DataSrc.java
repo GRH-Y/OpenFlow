@@ -1,11 +1,10 @@
 package server.rtsp;
 
 
-import server.avdecode.audio.DecodeMP4AACStream;
-import server.avdecode.video.DecodeMP4H264Stream;
+import server.rtsp.joggle.IDataSrc;
+import server.rtsp.joggle.IParameterConfig;
 import server.rtsp.packet.NalPacket;
 import server.rtsp.packet.PacketType;
-import server.rtsp.packet.RtcpPacket;
 import server.rtsp.packet.RtpPacket;
 import server.rtsp.rtp.RtpSocket;
 import task.message.MessageCourier;
@@ -20,182 +19,124 @@ import java.util.List;
  * Created by dell on 9/11/2017.
  */
 
-public class DataSrc {
-    private DecodeMP4H264Stream mp4Stream = null;
-    private DecodeMP4AACStream audioThread = null;
+public class DataSrc implements IDataSrc, IParameterConfig {
 
-    private List<RtpSocket> videoSet;
-    private List<RtpSocket> audioSet;
+    protected List<RtpSocket> videoSet;
+    protected List<RtpSocket> audioSet;
 
-    private RtpPacket videoRtpPacket;
-    private RtpPacket audioRtpPacket;
+    protected MessagePostOffice postOffice;
+    protected MessageCourier courier;
 
-    private RtcpPacket videoRtcpPacket;
-    private RtcpPacket audioRtcpPacket;
+    private String avDataReceiveMethod = "onAudioVideo";
 
-    private MessagePostOffice postOffice;
-    private MessageCourier courier;
+    private RtspServer server;
 
-    private String filePath;
 
-    public DataSrc(String filePath) {
-        this.filePath = filePath;
-        if (filePath == null) {
-            throw new NullPointerException("filePath is null !!!!");
-        }
+    public DataSrc(RtspServer server) {
+        this.server = server;
         courier = new MessageCourier(this);
         postOffice = new MessagePostOffice();
         courier.addEnvelopeServer(postOffice);
         videoSet = new ArrayList<>();
         audioSet = new ArrayList<>();
-//        videoRtpPacket = new RtpPacket();
-//        audioRtpPacket = new RtpPacket();
-//        videoRtpPacket.setClockFrequency(90000);
-//        audioRtpPacket.setClockFrequency(8000);
-//        videoRtcpPacket = new RtcpPacket(videoRtpPacket.getSSRC());
-//        audioRtcpPacket = new RtcpPacket(audioRtpPacket.getSSRC());
     }
 
-    public void setAudioRtcpPacket(RtcpPacket audioRtcpPacket) {
-        this.audioRtcpPacket = audioRtcpPacket;
+    public MessageCourier getCourier() {
+        return courier;
     }
 
-    public void setVideoRtcpPacket(RtcpPacket videoRtcpPacket) {
-        this.videoRtcpPacket = videoRtcpPacket;
+    public MessagePostOffice getPostOffice() {
+        return postOffice;
     }
 
-    public void setAudioRtpPacket(RtpPacket audioRtpPacket) {
-        this.audioRtpPacket = audioRtpPacket;
+    public void setAvDataReceiveMethod(String avDataReceiveMethod) {
+        this.avDataReceiveMethod = avDataReceiveMethod;
     }
 
-    public void setVideoRtpPacket(RtpPacket videoRtpPacket) {
-        this.videoRtpPacket = videoRtpPacket;
+    public String getAVDataReceiveName() {
+        return avDataReceiveMethod;
     }
 
+    @Override
+    public void addAudioSocket(RtpSocket audio) {
 
-    public RtpPacket getVideoRtpPacket() {
-        return videoRtpPacket;
     }
 
-    public RtpPacket getAudioRtpPacket() {
-        return audioRtpPacket;
+    @Override
+    public void addVideoSocket(RtpSocket video) {
+
     }
 
-    public RtcpPacket getVideoRtcpPacket() {
-        return videoRtcpPacket;
+    @Override
+    public void removeAudioSocket(RtpSocket audio) {
+
     }
 
-    public RtcpPacket getAudioRtcpPacket() {
-        return audioRtcpPacket;
+    @Override
+    public void removeVideoSocket(RtpSocket video) {
+
     }
 
+    @Override
+    public void initVideoEncode() {
+
+    }
+
+    @Override
+    public void initAudioEncode() {
+
+    }
+
+    @Override
+    public void startVideoEncode() {
+
+    }
+
+    @Override
+    public void stopVideoEncode() {
+
+    }
+
+    @Override
+    public void startAudioEncode() {
+
+    }
+
+    @Override
+    public void stopAudioEncode() {
+
+    }
+
+    @Override
+    public String getBase64SPS() {
+        return null;
+    }
+
+    @Override
+    public String getBase64PPS() {
+        return null;
+    }
+
+    @Override
+    public String getProfileLevel() {
+        return null;
+    }
+
+    @Override
+    public String getConfig() {
+        return null;
+    }
+
+    @Override
+    public int getSamplingRate() {
+        return 0;
+    }
+
+    @Override
     public void release() {
         postOffice.release();
         courier.release();
-        try {
-            finalize();
-        } catch (Throwable throwable) {
-            throwable.printStackTrace();
-        }
     }
-
-    public void addAudioSocket(RtpSocket audio) {
-        if (audioSet.size() == 0) {
-            audioThread.setAudioOutSwitch(true);
-        }
-        audioSet.add(audio);
-    }
-
-    public void addVideoSocket(RtpSocket video) {
-        if (videoSet.size() == 0) {
-//            videoThread.setVideoOutSwitch(true);
-            mp4Stream.setVideoOutSwitch(true);
-            mp4Stream.resumeSteam();
-        }
-        videoSet.add(video);
-    }
-
-    public void removeAudioSocket(RtpSocket audio) {
-        audioSet.remove(audio);
-        if (audioSet.size() == 0) {
-            audioThread.setAudioOutSwitch(false);
-            stopAudioEncode();
-        }
-    }
-
-    public void removeVideoSocket(RtpSocket video) {
-        videoSet.remove(video);
-        if (videoSet.size() == 0) {
-//            videoThread.setVideoOutSwitch(false);
-            mp4Stream.setVideoOutSwitch(false);
-            stopVideoEncode();
-        }
-    }
-
-    public void initVideoEncode() {
-//        if (videoThread == null)
-//        {
-//            videoThread = new EncodeH264Stream(surfaceView);
-//            videoThread.setVideoSize(1280, 720, 30);//1080x1920
-//        }
-        if (mp4Stream == null) {
-            try {
-                mp4Stream = new DecodeMP4H264Stream(filePath);
-            } catch (Exception e) {
-                e.printStackTrace();
-                mp4Stream = null;
-            }
-        }
-    }
-
-    public void initAudioEncode() {
-        audioThread = new DecodeMP4AACStream(filePath);
-    }
-
-    public void startVideoEncode() {
-//        videoThread.setMsgPostOffice(postOffice);
-//        videoThread.startEncode();
-        mp4Stream.setMsgPostOffice(postOffice, "onAudioVideo");
-        mp4Stream.startSteam();
-    }
-
-    public void stopVideoEncode() {
-//        videoThread.stopEncode();
-        mp4Stream.stopSteam();
-    }
-
-    public void startAudioEncode() {
-        audioThread.setMsgPostOffice(postOffice);
-        audioThread.startEncode();
-    }
-
-    public void stopAudioEncode() {
-        audioThread.stopEncode();
-    }
-
-    public String getBase64SPS() {
-//        return videoThread.getBase64SPS();
-        return mp4Stream.getBase64SPS();
-    }
-
-    public String getBase64PPS() {
-//        return videoThread.getBase64PPS();
-        return mp4Stream.getBase64PPS();
-    }
-
-    public String getProfileLevel() {
-//        return videoThread.getProfileLevel();
-        return mp4Stream.getProfileLevel();
-    }
-
-    public String getConfig() {
-        return Integer.toHexString(audioThread.getConfig());
-    }
-
-    public int getSamplingRate() {
-        return audioThread.getSamplingRate();
-    }
-
 
     private void sendData(RtpPacket rtpPacket, List<RtpSocket> socketList) {
         RtpSocket socket = socketList.get(0);
@@ -215,25 +156,29 @@ public class DataSrc {
         if (object instanceof NalPacket) {
             NalPacket packet = (NalPacket) envelope.getData();
             if (PacketType.AUDIO == packet.getPacketType()) {
+                RtpPacket audioRtpPacket = server.getAudioRtpPacket();
                 audioRtpPacket.setNalPacket(packet);
                 sendData(audioRtpPacket, audioSet);
             } else {
+                RtpPacket videoRtpPacket = server.getVideoRtpPacket();
                 videoRtpPacket.setNalPacket(packet);
                 sendData(videoRtpPacket, videoSet);
             }
             packet.setFullNal(false);
-        } else if (object instanceof RtpPacket) {
-            RtpPacket packet = (RtpPacket) envelope.getData();
-            if (PacketType.AUDIO == packet.getPacketType()) {
-                for (RtpSocket audio : audioSet) {
-                    audio.sendRtpPacket(packet);
-                }
-            } else {
-                for (RtpSocket video : videoSet) {
-                    video.sendRtpPacket(packet);
-                }
-            }
-        } else {
+        }
+//        else if (object instanceof RtpPacket) {
+//            RtpPacket packet = (RtpPacket) envelope.getData();
+//            if (PacketType.AUDIO == packet.getPacketType()) {
+//                for (RtpSocket audio : audioSet) {
+//                    audio.sendRtpPacket(packet);
+//                }
+//            } else {
+//                for (RtpSocket video : videoSet) {
+//                    video.sendRtpPacket(packet);
+//                }
+//            }
+//        }
+        else {
             LogDog.e("==> DataSrc onAudioVideo other data !!!");
         }
     }

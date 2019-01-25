@@ -2,7 +2,7 @@ package server.avdecode.video;
 
 
 import server.avdecode.mp4.Mp4Analysis;
-import server.rtsp.packet.ContentPacket;
+import server.rtsp.packet.OtherFramePacket;
 import server.rtsp.packet.RtpPacket;
 import task.executor.joggle.IConsumerAttribute;
 import util.IoUtils;
@@ -15,8 +15,8 @@ import java.util.List;
 public class DecodeMP4H264Stream extends VideoSteam {
 
     private String path;
-    private RandomAccessFile file = null;
     private int[] arrayStco = null;
+    private RandomAccessFile file = null;
     private List<Mp4Analysis.Stsc> stscList = null;
 
 
@@ -33,9 +33,9 @@ public class DecodeMP4H264Stream extends VideoSteam {
         Mp4Analysis mp4Analysis = new Mp4Analysis();
         mp4Analysis.init(path);
         mp4Analysis.findVideoBox();
-        arrayStco = mp4Analysis.getStco();
         pps = mp4Analysis.getPPS();
         sps = mp4Analysis.getSPS();
+        arrayStco = mp4Analysis.getStco();
         stscList = mp4Analysis.getListStsc();
         mp4Analysis.release();
         file = new RandomAccessFile(path, "r");
@@ -87,6 +87,7 @@ public class DecodeMP4H264Stream extends VideoSteam {
 
     @Override
     protected void onSteamEndInit() {
+        super.onSteamEndInit();
         if (!steamTrigger) {
             LogDog.d("==>DecodeMP4H264Stream 等待 RTSP播放指令!");
             taskContainer.getTaskExecutor().waitTask(0);
@@ -116,35 +117,35 @@ public class DecodeMP4H264Stream extends VideoSteam {
         //关键帧
         if (type == 5) {
             //发送sps和pps
-            parameterSetPacket.setTime(ts);
+            keyFramePacket.setTime(ts);
             if (steamTrigger) {
-                attribute.pushToCache(parameterSetPacket);
+                attribute.pushToCache(keyFramePacket);
                 resumeSteam();
             }
         }
 
         //type = 1(非关键帧)
         if (nalLength <= nalMaxLength) {
-            ContentPacket contentPacket = contentPacketCache.getRepeatData();
-            if (contentPacket == null) {
+            OtherFramePacket otherFramePacket = otherFramePacketCache.getRepeatData();
+            if (otherFramePacket == null) {
                 return false;
             }
-            contentPacket.setTime(ts);
-            byte[] data = contentPacket.getData();
+            otherFramePacket.setTime(ts);
+            byte[] data = otherFramePacket.getData();
             // Small NAL unit => Single NAL unit
             data[RtpPacket.RTP_HEADER_LENGTH] = header[4];
             nalLength--;
             int ret = IoUtils.readToFull(file, data, RtpPacket.RTP_HEADER_LENGTH + 1, nalLength);
-            contentPacket.setFullNal(true);
+            otherFramePacket.setFullNal(true);
             if (ret == IoUtils.FAIL) {
                 stopSteam();
                 return false;
             }
-            contentPacket.setLimit(nalLength + RtpPacket.RTP_HEADER_LENGTH);
+            otherFramePacket.setLimit(nalLength + RtpPacket.RTP_HEADER_LENGTH);
             if (steamTrigger) {
-                attribute.pushToCache(contentPacket);
+                attribute.pushToCache(otherFramePacket);
                 resumeSteam();
-                contentPacketCache.setRepeatData(contentPacket);
+                otherFramePacketCache.setRepeatData(otherFramePacket);
             }
         } else {
             // Large NAL unit => Split nal unit
@@ -157,11 +158,11 @@ public class DecodeMP4H264Stream extends VideoSteam {
 
             int sum = 1;
             while (sum < nalLength && taskContainer.getTaskExecutor().getLoopState()) {
-                ContentPacket contentPacket = contentPacketCache.getRepeatData();
-                if (contentPacket == null) {
+                OtherFramePacket otherFramePacket = otherFramePacketCache.getRepeatData();
+                if (otherFramePacket == null) {
                     return false;
                 }
-                byte[] data = contentPacket.getData();
+                byte[] data = otherFramePacket.getData();
 
                 data[RtpPacket.RTP_HEADER_LENGTH] = header[0];
                 data[RtpPacket.RTP_HEADER_LENGTH + 1] = header[1];
@@ -173,18 +174,18 @@ public class DecodeMP4H264Stream extends VideoSteam {
                     return false;
                 }
                 sum += len;
-                // Last parameterSetPacket before next NAL
+                // Last keyFramePacket before next NAL
                 if (sum >= nalLength) {
                     // End bit on
-                    contentPacket.setFullNal(true);
+                    otherFramePacket.setFullNal(true);
                     data[RtpPacket.RTP_HEADER_LENGTH + 1] += 0x40;
                 }
-                contentPacket.setLimit(RtpPacket.RTP_HEADER_LENGTH + 2 + len);
-                contentPacket.setTime(ts);
+                otherFramePacket.setLimit(RtpPacket.RTP_HEADER_LENGTH + 2 + len);
+                otherFramePacket.setTime(ts);
                 if (steamTrigger) {
-                    attribute.pushToCache(contentPacket);
+                    attribute.pushToCache(otherFramePacket);
                     resumeSteam();
-                    contentPacketCache.setRepeatData(contentPacket);
+                    otherFramePacketCache.setRepeatData(otherFramePacket);
                 }
                 // Switch startTask bit
                 header[1] = (byte) (header[1] & 0x7F);
