@@ -3,5 +3,6 @@ out/
 .idea/
 .gradle/
 classes/
+resources/
 OpenFlowTestMain.java
 Mp4DateSrc.java
