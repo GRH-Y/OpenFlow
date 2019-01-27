@@ -4,6 +4,7 @@ import connect.network.nio.NioClientFactory;
 import connect.network.nio.NioClientTask;
 import connect.network.nio.NioReceive;
 import connect.network.nio.NioSender;
+import server.rtsp.joggle.IDataSrc;
 import server.rtsp.protocol.RtspProtocol;
 import server.rtsp.rtp.RtpSocket;
 import util.LogDog;
@@ -35,10 +36,10 @@ public class RtspResponseClient extends NioClientTask {
     private String localAddress = null;
     private int localPort = 0;
 
-    private DataSrc dataSrc;
+    private IDataSrc dataSrc;
     private RtspServer server;
 
-    public RtspResponseClient(RtspServer server, DataSrc dataSrc, SocketChannel socket) {
+    public RtspResponseClient(RtspServer server, IDataSrc dataSrc, SocketChannel socket) {
         super(socket);
         this.dataSrc = dataSrc;
         this.server = server;
@@ -133,6 +134,7 @@ public class RtspResponseClient extends NioClientTask {
             audioSocket = new RtpSocket(remoteAddress, 5004, 5005);
             audioSocket.startConnect();
 
+            server.notifyStart();
             dataSrc.addVideoSocket(videoSocket);
             dataSrc.addAudioSocket(audioSocket);
 

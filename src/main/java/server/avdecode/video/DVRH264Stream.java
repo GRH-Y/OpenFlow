@@ -7,11 +7,7 @@ import server.camera.H264Preview;
 import server.rtsp.packet.NalPacket;
 import server.rtsp.packet.OtherFramePacket;
 import server.rtsp.packet.RtpPacket;
-import task.executor.TaskContainer;
 import task.executor.joggle.IConsumerAttribute;
-import task.executor.joggle.IConsumerTaskExecutor;
-import task.executor.joggle.ILoopTaskExecutor;
-import task.message.joggle.IMsgPostOffice;
 import util.LogDog;
 
 /**
@@ -20,21 +16,12 @@ import util.LogDog;
  */
 
 public class DVRH264Stream extends VideoSteam {
-    private IMsgPostOffice msgPostOffice;
-    private TaskContainer container;
     private int width = 640;
     private int height = 480;
     private int pixelFormat = H264Preview.CAMERA_PIX_FMT_H264;
-    private byte[] header = new byte[5];
     private long oldTime = 0, duration = 0, ts = 0;
-    private byte[] sps = null;
-    private byte[] pps = null;
     private byte[] keyNal = null;
-
-
-    public void setMsgPostOffice(IMsgPostOffice postOffice) {
-        this.msgPostOffice = postOffice;
-    }
+    private byte[] currentNal = null;
 
 
     public void setVideoSize(int width, int height, int pixelFormat) {
@@ -43,26 +30,30 @@ public class DVRH264Stream extends VideoSteam {
         this.pixelFormat = pixelFormat;
     }
 
+    public byte[] getKeyNal() {
+        return keyNal;
+    }
+
     public String getBase64SPS() {
 //        return "QgAo9AWh6IA=";
-        while (sps == null && container.getTaskExecutor().isStartState()) {
-            container.getTaskExecutor().waitTask(0);
+        while (sps == null && taskContainer.getTaskExecutor().isStartState()) {
+            taskContainer.getTaskExecutor().waitTask(0);
         }
         return Mp4Analysis.getBase64SPS(sps);
     }
 
     public String getBase64PPS() {
 //        return "zjiA";
-        while (pps == null && container.getTaskExecutor().isStartState()) {
-            container.getTaskExecutor().waitTask(0);
+        while (pps == null && taskContainer.getTaskExecutor().isStartState()) {
+            taskContainer.getTaskExecutor().waitTask(0);
         }
         return Mp4Analysis.getBase64PPS(pps);
     }
 
     public String getProfileLevel() {
 //        return "0028f4";
-        while (sps == null && container.getTaskExecutor().isStartState()) {
-            container.getTaskExecutor().waitTask(0);
+        while (sps == null && taskContainer.getTaskExecutor().isStartState()) {
+            taskContainer.getTaskExecutor().waitTask(0);
         }
         return Mp4Analysis.getProfileLevel(sps);
     }
@@ -71,22 +62,7 @@ public class DVRH264Stream extends VideoSteam {
     protected boolean onSteamBeginInit() {
         LogDog.w("--> DVR H264Stream start ing ....");
         //初始化摄像头
-        ts = 0;
-        boolean isOpen = H264Preview.openCamera(width, height, pixelFormat);
-        if (isOpen) {
-            try {
-                //开启异步线程处理发送数据
-                IConsumerTaskExecutor executor = container.getTaskExecutor();
-                executor.startAsyncProcessData();
-            } catch (Exception e) {
-                e.printStackTrace();
-                stopSteam();
-            }
-        } else {
-            LogDog.e("--> DVR H264Stream open error !");
-            stopSteam();
-        }
-        return false;
+        return H264Preview.openCamera(width, height, pixelFormat);
     }
 
     @Override
@@ -100,10 +76,10 @@ public class DVRH264Stream extends VideoSteam {
 
     @Override
     protected void onSteamCreateNalData() {
-        IConsumerAttribute<NalPacket> attribute = container.getAttribute();
+        IConsumerAttribute<NalPacket> attribute = taskContainer.getAttribute();
         oldTime = System.nanoTime();
-        byte[] nal = H264Preview.getH264();
-        if (nal == null) {
+        currentNal = H264Preview.getH264();
+        if (currentNal == null) {
             stopSteam();
             return;
         }
@@ -111,36 +87,38 @@ public class DVRH264Stream extends VideoSteam {
         int skipLength;
         ts += duration;
 
-        NalAnalysis.NalInfo nalInfo = NalAnalysis.analysis(nal);
+        NalAnalysis.NalInfo nalInfo = NalAnalysis.analysis(currentNal);
         if (nalInfo == null) {
             return;
         }
         if (nalInfo.isHasPPSAndSPS()) {
             sps = nalInfo.getSPS();
             pps = nalInfo.getPPS();
-            keyNal = nal;
+            keyNal = currentNal;
         }
 
-        System.arraycopy(nal, 0, header, 0, header.length);
+        System.arraycopy(currentNal, 0, header, 0, header.length);
         skipLength = 5;
 
+        int type = header[4] & 0x1F;
+        execNalData(header, type, currentNal.length, ts);
 
-        if (nal.length <= nalMaxLength) {
+        if (currentNal.length <= nalMaxLength) {
             OtherFramePacket contentPacket = otherFramePacketCache.getRepeatData();
             if (contentPacket == null) {
-                contentPacket = new OtherFramePacket(RtpPacket.MTU);
+                return;
             }
             contentPacket.setTime(ts);
-            byte[] data = contentPacket.getData();
-            data[RtpPacket.RTP_HEADER_LENGTH] = header[4];
+            byte[] framePacketData = contentPacket.getData();
+            framePacketData[RtpPacket.RTP_HEADER_LENGTH] = header[4];
             skipLength--;
-            System.arraycopy(nal, skipLength, data, RtpPacket.RTP_HEADER_LENGTH + 1, nal.length - skipLength);
-            LogDog.i("==> single rtp = " + byteToHexStr(data));
+            System.arraycopy(currentNal, skipLength, framePacketData, RtpPacket.RTP_HEADER_LENGTH + 1, currentNal.length - skipLength);
+            LogDog.i("==> single rtp = " + byteToHexStr(framePacketData));
             contentPacket.setFullNal(true);
-            contentPacket.setLimit(nal.length - skipLength + RtpPacket.RTP_HEADER_LENGTH);
+            contentPacket.setLimit(currentNal.length - skipLength + RtpPacket.RTP_HEADER_LENGTH);
             if (steamTrigger) {
                 attribute.pushToCache(contentPacket);
-                resumeTask();
+                resumeSteam();
             }
             otherFramePacketCache.setRepeatData(contentPacket);
         } else {
@@ -149,7 +127,7 @@ public class DVRH264Stream extends VideoSteam {
             header[0] = (byte) (header[4] & 0x60); // FU indicator NRI
             header[0] |= 28;
 
-            while (skipLength < nal.length) {
+            while (skipLength < currentNal.length) {
                 OtherFramePacket contentPacket = otherFramePacketCache.getRepeatData();
                 if (contentPacket == null) {
                     contentPacket = new OtherFramePacket(RtpPacket.MTU);
@@ -160,12 +138,12 @@ public class DVRH264Stream extends VideoSteam {
                 data[RtpPacket.RTP_HEADER_LENGTH] = header[0];
                 data[RtpPacket.RTP_HEADER_LENGTH + 1] = header[1];
 
-                int len = nal.length - skipLength > nalMaxLength ? nalMaxLength : nal.length - skipLength;
-                System.arraycopy(nal, skipLength, data, RtpPacket.RTP_HEADER_LENGTH + 2, len);
+                int len = currentNal.length - skipLength > nalMaxLength ? nalMaxLength : currentNal.length - skipLength;
+                System.arraycopy(currentNal, skipLength, data, RtpPacket.RTP_HEADER_LENGTH + 2, len);
 //                    LogDog.i("==> long rtp = " + Utils.bytes2HexString(data));
                 skipLength += len;
                 // Last keyFramePacket before next NAL
-                if (nal.length == skipLength) {
+                if (currentNal.length == skipLength) {
                     // End bit on
                     contentPacket.setFullNal(true);
                     data[RtpPacket.RTP_HEADER_LENGTH + 1] |= 0x40;
@@ -174,7 +152,7 @@ public class DVRH264Stream extends VideoSteam {
                 contentPacket.setTime(ts);
                 if (steamTrigger) {
                     attribute.pushToCache(contentPacket);
-                    resumeTask();
+                    resumeSteam();
                 }
                 otherFramePacketCache.setRepeatData(contentPacket);
                 // Switch start bit
@@ -184,15 +162,26 @@ public class DVRH264Stream extends VideoSteam {
         duration = System.nanoTime() - oldTime;
     }
 
+
+    @Override
+    protected void onSingleNal(byte[] framePacketData, int nalLength) {
+//        System.arraycopy(currentNal, 5, framePacketData, RtpPacket.RTP_HEADER_LENGTH + 1, currentNal.length - skipLength);
+        System.arraycopy(currentNal, 5, framePacketData, RtpPacket.RTP_HEADER_LENGTH + 1, currentNal.length - 5);
+    }
+
+    @Override
+    protected int onSplitNal(byte[] framePacketData, int nalLength, int sum) {
+        int len = nalLength - sum > nalMaxLength ? nalMaxLength : nalLength - sum;
+        System.arraycopy(currentNal, sum, framePacketData, RtpPacket.RTP_HEADER_LENGTH + 2, len);
+        return len;
+    }
+
     @Override
     protected void onSteamDestroy() {
         LogDog.w("--> DVR H264Stream  stop ing ....");
         H264Preview.stopCamera();
     }
 
-    public byte[] getKeyNal() {
-        return keyNal;
-    }
 
 //    public List<NalPacket> getKeyNalToNalPacket() {
 //        RecorderTask recorderTask = container.getTask();
@@ -262,16 +251,6 @@ public class DVRH264Stream extends VideoSteam {
 //            return result;
 //        }
 
-
-    private void resumeTask() {
-        IConsumerTaskExecutor executor = container.getTaskExecutor();
-        ILoopTaskExecutor asyncExecutor = executor.getAsyncTaskExecutor();
-        if (asyncExecutor != null) {
-            asyncExecutor.resumeTask();
-        } else {
-            container.getTaskExecutor().resumeTask();
-        }
-    }
 
     private String byteToHexStr(byte[] b) {
         StringBuilder sb = new StringBuilder();

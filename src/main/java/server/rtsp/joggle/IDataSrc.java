@@ -2,7 +2,7 @@ package server.rtsp.joggle;
 
 import server.rtsp.rtp.RtpSocket;
 
-public interface IDataSrc {
+public interface IDataSrc extends IParameterConfig{
 
     void addAudioSocket(RtpSocket audio);
 

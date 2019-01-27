@@ -94,6 +94,11 @@ public class RtspServer extends NioServerTask {
         NioClientFactory.getFactory().close();
     }
 
+    protected void notifyStart() {
+        dataSrc.startAudioEncode();
+        dataSrc.startVideoEncode();
+    }
+
     protected void notifyStop() {
         connectNumber--;
         if (connectNumber <= 0) {

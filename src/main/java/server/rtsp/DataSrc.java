@@ -2,7 +2,6 @@ package server.rtsp;
 
 
 import server.rtsp.joggle.IDataSrc;
-import server.rtsp.joggle.IParameterConfig;
 import server.rtsp.packet.NalPacket;
 import server.rtsp.packet.PacketType;
 import server.rtsp.packet.RtpPacket;
@@ -19,7 +18,7 @@ import java.util.List;
  * Created by dell on 9/11/2017.
  */
 
-public class DataSrc implements IDataSrc, IParameterConfig {
+public class DataSrc implements IDataSrc {
 
     protected List<RtpSocket> videoSet;
     protected List<RtpSocket> audioSet;

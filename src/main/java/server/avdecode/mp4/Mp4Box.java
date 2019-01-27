@@ -185,20 +185,6 @@ public class Mp4Box {
                     stsdBox.parseSub();
                 }
                 break;
-//            case Avc1Box.BOX_NAME:
-//                if (currentTrakBox != null) {
-//                    Avc1Box avc1Box = new Avc1Box(length);
-//                    currentTrakBox.mdiaBox.minfBox.stblBox.stsdBox.avc1Box = avc1Box;
-//                    avc1Box.parseSub();
-//                }
-//                break;
-            case AvcCBox.BOX_NAME:
-                if (currentTrakBox != null) {
-                    AvcCBox avcCBox = new AvcCBox(length);
-                    currentTrakBox.mdiaBox.minfBox.stblBox.stsdBox.avc1Box.avcCBox = avcCBox;
-                    avcCBox.parseSub();
-                }
-                break;
             case SttsBox.BOX_NAME:
                 if (currentTrakBox != null) {
                     SttsBox sttsBox = new SttsBox(length);
@@ -265,16 +251,8 @@ public class Mp4Box {
         return ftypBox;
     }
 
-    public void setFtypBox(FtypBox ftypBox) {
-        this.ftypBox = ftypBox;
-    }
-
     public MoovBox getMoovBox() {
         return moovBox;
-    }
-
-    public void setMoovBox(MoovBox moovBox) {
-        this.moovBox = moovBox;
     }
 
     public void release() {
@@ -312,7 +290,7 @@ public class Mp4Box {
             return array;
         }
 
-        abstract void parseSub() throws Exception;
+        protected abstract void parseSub() throws Exception;
 
         public void release() {
             srcData = null;
@@ -321,7 +299,21 @@ public class Mp4Box {
 
     /*-------------------------------下面是所有Box------------------------------*/
 
-    private class FtypBox extends Box {
+//    public class AvcCBox extends Box {
+//        public final static String BOX_NAME = "avcC";
+//
+//        public AvcCBox(long length) throws IOException {
+//            super(true, length);
+//        }
+//
+//        @Override
+//        protected void parseSub() throws Exception {
+//
+//        }
+//    }
+
+
+    public class FtypBox extends Box {
         public final static String BOX_NAME = "ftyp";
         public String majorBrand = null;
         public String minorVersion = null;
@@ -332,7 +324,7 @@ public class Mp4Box {
         }
 
         @Override
-        void parseSub() throws Exception {
+        protected void parseSub() throws Exception {
             int index = 0;
             majorBrand = new String(srcData, index, 4);
             index += 4;
@@ -366,7 +358,7 @@ public class Mp4Box {
 
 
         @Override
-        void parseSub() throws Exception {
+        protected void parseSub() throws Exception {
         }
 
         @Override
@@ -402,7 +394,7 @@ public class Mp4Box {
         }
 
         @Override
-        void parseSub() throws Exception {
+        protected void parseSub() throws Exception {
             long time = TypeConversion.byteToLong(srcData);
             creationTime = transForLongToDate(time);
             long mtime = TypeConversion.byteToLong(srcData, 8, 12);
@@ -425,7 +417,7 @@ public class Mp4Box {
         }
 
         @Override
-        void parseSub() throws Exception {
+        protected void parseSub() throws Exception {
 //            tkhdBox = new TkhdBox();
 //            tkhdBox.parseSub();
 //            edtsBox = new EdtsBox();
@@ -458,7 +450,7 @@ public class Mp4Box {
         }
 
         @Override
-        void parseSub() throws Exception {
+        protected void parseSub() throws Exception {
             trakBox.isMovie = width > 0 && height > 0;
         }
     }
@@ -472,7 +464,7 @@ public class Mp4Box {
         }
 
         @Override
-        void parseSub() throws Exception {
+        protected void parseSub() throws Exception {
         }
     }
 
@@ -487,7 +479,7 @@ public class Mp4Box {
         }
 
         @Override
-        void parseSub() throws Exception {
+        protected void parseSub() throws Exception {
         }
     }
 
@@ -502,7 +494,7 @@ public class Mp4Box {
         }
 
         @Override
-        void parseSub() throws Exception {
+        protected void parseSub() throws Exception {
 //            mdhdBox = new MdhdBox();
 //            mdhdBox.parseSub();
 //            hdlrBox = new HdlrBox();
@@ -526,7 +518,7 @@ public class Mp4Box {
         }
 
         @Override
-        void parseSub() throws Exception {
+        protected void parseSub() throws Exception {
         }
     }
 
@@ -540,7 +532,7 @@ public class Mp4Box {
         }
 
         @Override
-        void parseSub() throws Exception {
+        protected void parseSub() throws Exception {
         }
     }
 
@@ -555,7 +547,7 @@ public class Mp4Box {
         }
 
         @Override
-        void parseSub() throws Exception {
+        protected void parseSub() throws Exception {
 //            vmhdBox = new VmhdBox();
 //            vmhdBox.parseSub();
 //            dinfBox = new DinfBox();
@@ -573,7 +565,7 @@ public class Mp4Box {
         }
 
         @Override
-        void parseSub() throws Exception {
+        protected void parseSub() throws Exception {
         }
     }
 
@@ -586,7 +578,7 @@ public class Mp4Box {
         }
 
         @Override
-        void parseSub() throws Exception {
+        protected void parseSub() throws Exception {
 //            drefBox = new DrefBox();
 //            drefBox.parseSub();
         }
@@ -601,7 +593,7 @@ public class Mp4Box {
         }
 
         @Override
-        void parseSub() throws Exception {
+        protected void parseSub() throws Exception {
         }
     }
 
@@ -620,7 +612,7 @@ public class Mp4Box {
         }
 
         @Override
-        void parseSub() throws Exception {
+        protected void parseSub() throws Exception {
 //            stsdBox = new StsdBox();
 //            stsdBox.parseSub();
 //            sttsBox = new SttsBox();
@@ -640,46 +632,58 @@ public class Mp4Box {
 
     public class StsdBox extends Box {
         public final static String BOX_NAME = "stsd";
-        public Avc1Box avc1Box = null;
+//        public Avc1Box avc1Box = null;
+//        private AvcCBox avcCBox = null;
+
+        private byte[] avcC = new byte[]{0x61, 0x76, 0x63, 0x43};
+
+        public byte[] sps = null;
+        public byte[] pps = null;
 
         public StsdBox(long length) throws IOException {
-            super(false, length);
-        }
-
-        @Override
-        void parseSub() throws Exception {
-//            avc1Box = new Avc1Box(srcData.length);
-//            avc1Box.parseSub();
-        }
-    }
-
-    public class Avc1Box extends Box {
-        public final static String BOX_NAME = "avc1";
-        public AvcCBox avcCBox = null;
-
-        public Avc1Box(long length) throws IOException {
-            super(false, length);
-//            srcData = data;
-        }
-
-        @Override
-        void parseSub() throws Exception {
-//            avcCBox = new AvcCBox();
-//            avcCBox.parseSub();
-        }
-    }
-
-    public class AvcCBox extends Box {
-        public final static String BOX_NAME = "avcC";
-
-        public AvcCBox(long length) throws IOException {
             super(true, length);
         }
 
         @Override
-        void parseSub() throws Exception {
+        protected void parseSub() throws Exception {
+            for (int index = 0; index < srcData.length; index++) {
+                if (srcData[index] != avcC[0]) {
+                    continue;
+                }
+                if (srcData[index + 1] == avcC[1] && srcData[index + 2] == avcC[2] && srcData[index + 3] == avcC[3]) {
+                    // 找到avcC，则记录avcRecord起始位置，然后退出循环。
+                    int spsStartPos = index + 10;
+                    int spsLength = TypeConversion.byteToInt(srcData, spsStartPos, spsStartPos + 1);
+                    sps = new byte[spsLength];
+                    spsStartPos += 2;
+                    System.arraycopy(srcData, spsStartPos, sps, 0, spsLength);
+
+                    int ppsStartPos = spsStartPos + spsLength + 1;
+                    int ppsLength = TypeConversion.byteToInt(srcData, ppsStartPos, ppsStartPos + 1);
+                    pps = new byte[ppsLength];
+                    ppsStartPos += 2;
+                    System.arraycopy(srcData, ppsStartPos, pps, 0, ppsLength);
+                    break;
+                }
+            }
         }
     }
+
+//    public class Avc1Box extends Box {
+//        public final static String BOX_NAME = "avc1";
+//        public AvcCBox avcCBox = null;
+//
+//        public Avc1Box(long length) throws IOException {
+//            super(false, length);
+////            srcData = data;
+//        }
+//
+//        @Override
+//        protected void parseSub() throws Exception {
+////            avcCBox = new AvcCBox();
+////            avcCBox.parseSub();
+//        }
+//    }
 
     /**
      * “stts”存储了sample的duration，描述了sample时序的映射方法，我们通过它可以找到任何时间的sample。
@@ -696,7 +700,7 @@ public class Mp4Box {
         }
 
         @Override
-        void parseSub() throws Exception {
+        protected void parseSub() throws Exception {
             sttsArray = parseArray();
         }
     }
@@ -709,7 +713,7 @@ public class Mp4Box {
         }
 
         @Override
-        void parseSub() throws Exception {
+        protected void parseSub() throws Exception {
         }
     }
 
@@ -727,7 +731,7 @@ public class Mp4Box {
         }
 
         @Override
-        void parseSub() throws Exception {
+        protected void parseSub() throws Exception {
             stssArray = parseArray();
         }
     }
@@ -738,15 +742,32 @@ public class Mp4Box {
      */
     public class StscBox extends Box {
         public final static String BOX_NAME = "stsc";
-        public int[] stscArray;
+        public List<Stsc> stscList;
+        public long count = 0;
 
         public StscBox(long length) throws IOException {
             super(true, length);
         }
 
+        public class Stsc {
+            public int firstChunk = 0;
+            public int SamplesPerChunk = 0;
+            public int SampleDescriptionIndex = 0;
+        }
+
         @Override
-        void parseSub() throws Exception {
-            stscArray = parseArray();
+        protected void parseSub() throws Exception {
+            count = TypeConversion.byteToLong(srcData);
+            stscList = new ArrayList<>((int) count);
+            for (int index = 8; index < srcData.length; index += 4) {
+                Stsc stsc = new Stsc();
+                stsc.firstChunk = TypeConversion.byteToInt(srcData, index);
+                index += 4;
+                stsc.SamplesPerChunk = TypeConversion.byteToInt(srcData, index);
+                index += 4;
+                stsc.SampleDescriptionIndex = TypeConversion.byteToInt(srcData, index);
+                stscList.add(stsc);
+            }
         }
     }
 
@@ -762,7 +783,7 @@ public class Mp4Box {
         }
 
         @Override
-        void parseSub() throws Exception {
+        protected void parseSub() throws Exception {
             stszArray = parseArray();
         }
     }
@@ -781,7 +802,7 @@ public class Mp4Box {
         }
 
         @Override
-        void parseSub() throws Exception {
+        protected void parseSub() throws Exception {
             stcoArray = parseArray();
         }
     }

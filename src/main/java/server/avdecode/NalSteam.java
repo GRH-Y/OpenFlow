@@ -48,7 +48,7 @@ public abstract class NalSteam {
     }
 
     public void stopSteam() {
-        taskContainer.getTaskExecutor().stopTask();
+        taskContainer.getTaskExecutor().idleStopTask();
     }
 
     //===================start 生命周期回调方法======================
@@ -64,35 +64,44 @@ public abstract class NalSteam {
     //=====================end 生命周期回调方法====================
 
     private class SteamTask extends BaseConsumerTask<NalPacket> {
+        private boolean initResult = false;
 
         @Override
         protected void onInitTask() {
-            boolean ret = onSteamBeginInit();
-            if (ret) {
+            initResult = onSteamBeginInit();
+            if (initResult) {
                 onSteamEndInit();
                 //开启异步线程处理发送数据
                 IConsumerTaskExecutor executor = taskContainer.getTaskExecutor();
                 executor.startAsyncProcessData();
+            } else {
+                taskContainer.getTaskExecutor().stopTask();
             }
         }
 
         private void sendData(Object data) {
-            MessageEnvelope envelope = new MessageEnvelope();
-            envelope.setData(data);
-            envelope.setMethodName(receiveMethodName);
-            msgPostOffice.sendEnvelope(envelope);
+            if (data != null) {
+                MessageEnvelope envelope = new MessageEnvelope();
+                envelope.setData(data);
+                envelope.setMethodName(receiveMethodName);
+                msgPostOffice.sendEnvelope(envelope);
+            }
         }
 
         @Override
         protected void onCreateData() {
-            onSteamCreateNalData();
+            if (initResult) {
+                onSteamCreateNalData();
+            }
         }
 
         @Override
         protected void onProcess() {
-            IConsumerAttribute attribute = taskContainer.getAttribute();
-            Object data = attribute.popCacheData();
-            sendData(data);
+            if (initResult) {
+                IConsumerAttribute attribute = taskContainer.getAttribute();
+                Object data = attribute.popCacheData();
+                sendData(data);
+            }
         }
 
         @Override
@@ -110,7 +119,6 @@ public abstract class NalSteam {
         @Override
         protected void onDestroyTask() {
             onSteamDestroy();
-
         }
     }
 }
