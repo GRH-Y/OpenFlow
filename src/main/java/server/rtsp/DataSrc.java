@@ -11,7 +11,6 @@ import task.message.MessageEnvelope;
 import task.message.MessagePostOffice;
 import util.LogDog;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -20,24 +19,27 @@ import java.util.List;
 
 public class DataSrc implements IDataSrc {
 
-    protected List<RtpSocket> videoSet;
-    protected List<RtpSocket> audioSet;
-
     protected MessagePostOffice postOffice;
     protected MessageCourier courier;
 
     private String avDataReceiveMethod = "onAudioVideo";
 
-    private RtspServer server;
+    private RtpPacket videoRtpPacket;
+    private RtpPacket audioRtpPacket;
 
+    protected List<RtpSocket> videoSet;
+    protected List<RtpSocket> audioSet;
 
     public DataSrc(RtspServer server) {
-        this.server = server;
+        server.setDataSrc(this);
+        audioSet = server.getAudioSet();
+        videoSet = server.getVideoSet();
+        audioRtpPacket = server.getAudioRtpPacket();
+        videoRtpPacket = server.getVideoRtpPacket();
+
         courier = new MessageCourier(this);
         postOffice = new MessagePostOffice();
         courier.addEnvelopeServer(postOffice);
-        videoSet = new ArrayList<>();
-        audioSet = new ArrayList<>();
     }
 
     public MessageCourier getCourier() {
@@ -54,6 +56,10 @@ public class DataSrc implements IDataSrc {
 
     public String getAVDataReceiveName() {
         return avDataReceiveMethod;
+    }
+
+    @Override
+    public void setSteamOutSwitch(boolean isOpen) {
     }
 
     @Override
@@ -77,13 +83,13 @@ public class DataSrc implements IDataSrc {
     }
 
     @Override
-    public void initVideoEncode() {
-
+    public <T> T initVideoEncode() {
+        return null;
     }
 
     @Override
-    public void initAudioEncode() {
-
+    public <T> T initAudioEncode() {
+        return null;
     }
 
     @Override
@@ -155,29 +161,16 @@ public class DataSrc implements IDataSrc {
         if (object instanceof NalPacket) {
             NalPacket packet = (NalPacket) envelope.getData();
             if (PacketType.AUDIO == packet.getPacketType()) {
-                RtpPacket audioRtpPacket = server.getAudioRtpPacket();
+//                RtpPacket audioRtpPacket = server.getAudioRtpPacket();
                 audioRtpPacket.setNalPacket(packet);
                 sendData(audioRtpPacket, audioSet);
             } else {
-                RtpPacket videoRtpPacket = server.getVideoRtpPacket();
+//                RtpPacket videoRtpPacket = server.getVideoRtpPacket();
                 videoRtpPacket.setNalPacket(packet);
                 sendData(videoRtpPacket, videoSet);
             }
             packet.setFullNal(false);
-        }
-//        else if (object instanceof RtpPacket) {
-//            RtpPacket packet = (RtpPacket) envelope.getData();
-//            if (PacketType.AUDIO == packet.getPacketType()) {
-//                for (RtpSocket audio : audioSet) {
-//                    audio.sendRtpPacket(packet);
-//                }
-//            } else {
-//                for (RtpSocket video : videoSet) {
-//                    video.sendRtpPacket(packet);
-//                }
-//            }
-//        }
-        else {
+        } else {
             LogDog.e("==> DataSrc onAudioVideo other data !!!");
         }
     }

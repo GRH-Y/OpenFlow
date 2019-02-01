@@ -28,11 +28,17 @@ public class NalPacket {
 //    private byte header = 0;
 
     public NalPacket(int packetSize) {
+        if (packetSize <= 0) {
+            throw new IllegalArgumentException("packetSize is 0");
+        }
         data = new byte[packetSize];
         limit = packetSize;
     }
 
     public NalPacket(byte[] sps, byte[] pps, int headerLength) {
+        if (sps == null || pps == null || headerLength <= 0) {
+            throw new IllegalArgumentException("sps is null or pps is null or headerLength is 0");
+        }
         // STAP-A NAL header + NALU 1 (SPS) size + NALU 2 (PPS) size = 5 bytes
         data = new byte[sps.length + pps.length + 5 + headerLength];
         setStreamParameters(sps, pps);

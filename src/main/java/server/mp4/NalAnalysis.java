@@ -1,4 +1,4 @@
-package server.avdecode.mp4;
+package server.mp4;
 
 public class NalAnalysis {
 

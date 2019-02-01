@@ -29,8 +29,8 @@ public class RtcpPacket {
         /* Byte 8,9,10,11    ->  NTP timestamp hb				 */
         /* Byte 12,13,14,15  ->  NTP timestamp lb				 */
         /* Byte 16,17,18,19  ->  RTP timestamp		             */
-        /* Byte 20,21,22,23  ->  packet count				 	 */
-        /* Byte 24,25,26,27  ->  octet count			         */
+        /* Byte 20,21,22,23  ->  packet numCount				 	 */
+        /* Byte 24,25,26,27  ->  octet numCount			         */
     }
 
     /**

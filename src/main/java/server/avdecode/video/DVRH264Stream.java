@@ -1,13 +1,10 @@
 package server.avdecode.video;
 
 
-import server.avdecode.mp4.Mp4Analysis;
-import server.avdecode.mp4.NalAnalysis;
 import server.camera.H264Preview;
-import server.rtsp.packet.NalPacket;
-import server.rtsp.packet.OtherFramePacket;
+import server.mp4.Mp4Analysis;
+import server.mp4.NalAnalysis;
 import server.rtsp.packet.RtpPacket;
-import task.executor.joggle.IConsumerAttribute;
 import util.LogDog;
 
 /**
@@ -76,7 +73,7 @@ public class DVRH264Stream extends VideoSteam {
 
     @Override
     protected void onSteamCreateNalData() {
-        IConsumerAttribute<NalPacket> attribute = taskContainer.getAttribute();
+//        IConsumerAttribute<NalPacket> attribute = taskContainer.getAttribute();
         oldTime = System.nanoTime();
         currentNal = H264Preview.getH264();
         if (currentNal == null) {
@@ -84,7 +81,7 @@ public class DVRH264Stream extends VideoSteam {
             return;
         }
 
-        int skipLength;
+//        int skipLength;
         ts += duration;
 
         NalAnalysis.NalInfo nalInfo = NalAnalysis.analysis(currentNal);
@@ -98,67 +95,67 @@ public class DVRH264Stream extends VideoSteam {
         }
 
         System.arraycopy(currentNal, 0, header, 0, header.length);
-        skipLength = 5;
+//        skipLength = 5;
 
         int type = header[4] & 0x1F;
         execNalData(header, type, currentNal.length, ts);
 
-        if (currentNal.length <= nalMaxLength) {
-            OtherFramePacket contentPacket = otherFramePacketCache.getRepeatData();
-            if (contentPacket == null) {
-                return;
-            }
-            contentPacket.setTime(ts);
-            byte[] framePacketData = contentPacket.getData();
-            framePacketData[RtpPacket.RTP_HEADER_LENGTH] = header[4];
-            skipLength--;
-            System.arraycopy(currentNal, skipLength, framePacketData, RtpPacket.RTP_HEADER_LENGTH + 1, currentNal.length - skipLength);
-            LogDog.i("==> single rtp = " + byteToHexStr(framePacketData));
-            contentPacket.setFullNal(true);
-            contentPacket.setLimit(currentNal.length - skipLength + RtpPacket.RTP_HEADER_LENGTH);
-            if (steamTrigger) {
-                attribute.pushToCache(contentPacket);
-                resumeSteam();
-            }
-            otherFramePacketCache.setRepeatData(contentPacket);
-        } else {
-            header[1] = (byte) (header[4] & 0x1F);  // FU header type
-            header[1] |= 0x80; // Start bit
-            header[0] = (byte) (header[4] & 0x60); // FU indicator NRI
-            header[0] |= 28;
-
-            while (skipLength < currentNal.length) {
-                OtherFramePacket contentPacket = otherFramePacketCache.getRepeatData();
-                if (contentPacket == null) {
-                    contentPacket = new OtherFramePacket(RtpPacket.MTU);
-                }
-                byte[] data = contentPacket.getData();
-                contentPacket.setFullNal(false);
-
-                data[RtpPacket.RTP_HEADER_LENGTH] = header[0];
-                data[RtpPacket.RTP_HEADER_LENGTH + 1] = header[1];
-
-                int len = currentNal.length - skipLength > nalMaxLength ? nalMaxLength : currentNal.length - skipLength;
-                System.arraycopy(currentNal, skipLength, data, RtpPacket.RTP_HEADER_LENGTH + 2, len);
-//                    LogDog.i("==> long rtp = " + Utils.bytes2HexString(data));
-                skipLength += len;
-                // Last keyFramePacket before next NAL
-                if (currentNal.length == skipLength) {
-                    // End bit on
-                    contentPacket.setFullNal(true);
-                    data[RtpPacket.RTP_HEADER_LENGTH + 1] |= 0x40;
-                }
-                contentPacket.setLimit(RtpPacket.RTP_HEADER_LENGTH + 2 + len);
-                contentPacket.setTime(ts);
-                if (steamTrigger) {
-                    attribute.pushToCache(contentPacket);
-                    resumeSteam();
-                }
-                otherFramePacketCache.setRepeatData(contentPacket);
-                // Switch start bit
-                header[1] = (byte) (header[1] & 0x7F);
-            }
-        }
+//        if (currentNal.length <= nalMaxLength) {
+//            OtherFramePacket contentPacket = otherFramePacketCache.getRepeatData();
+//            if (contentPacket == null) {
+//                return;
+//            }
+//            contentPacket.setTime(ts);
+//            byte[] framePacketData = contentPacket.getData();
+//            framePacketData[RtpPacket.RTP_HEADER_LENGTH] = header[4];
+//            skipLength--;
+//            System.arraycopy(currentNal, skipLength, framePacketData, RtpPacket.RTP_HEADER_LENGTH + 1, currentNal.length - skipLength);
+//            LogDog.i("==> single rtp = " + byteToHexStr(framePacketData));
+//            contentPacket.setFullNal(true);
+//            contentPacket.setLimit(currentNal.length - skipLength + RtpPacket.RTP_HEADER_LENGTH);
+//            if (steamTrigger) {
+//                attribute.pushToCache(contentPacket);
+//                resumeSteam();
+//            }
+//            otherFramePacketCache.setRepeatData(contentPacket);
+//        } else {
+//            header[1] = (byte) (header[4] & 0x1F);  // FU header type
+//            header[1] |= 0x80; // Start bit
+//            header[0] = (byte) (header[4] & 0x60); // FU indicator NRI
+//            header[0] |= 28;
+//
+//            while (skipLength < currentNal.length) {
+//                OtherFramePacket contentPacket = otherFramePacketCache.getRepeatData();
+//                if (contentPacket == null) {
+//                    contentPacket = new OtherFramePacket(RtpPacket.MTU);
+//                }
+//                byte[] data = contentPacket.getData();
+//                contentPacket.setFullNal(false);
+//
+//                data[RtpPacket.RTP_HEADER_LENGTH] = header[0];
+//                data[RtpPacket.RTP_HEADER_LENGTH + 1] = header[1];
+//
+//                int len = currentNal.length - skipLength > nalMaxLength ? nalMaxLength : currentNal.length - skipLength;
+//                System.arraycopy(currentNal, skipLength, data, RtpPacket.RTP_HEADER_LENGTH + 2, len);
+////                    LogDog.i("==> long rtp = " + Utils.bytes2HexString(data));
+//                skipLength += len;
+//                // Last keyFramePacket before next NAL
+//                if (currentNal.length == skipLength) {
+//                    // End bit on
+//                    contentPacket.setFullNal(true);
+//                    data[RtpPacket.RTP_HEADER_LENGTH + 1] |= 0x40;
+//                }
+//                contentPacket.setLimit(RtpPacket.RTP_HEADER_LENGTH + 2 + len);
+//                contentPacket.setTime(ts);
+//                if (steamTrigger) {
+//                    attribute.pushToCache(contentPacket);
+//                    resumeSteam();
+//                }
+//                otherFramePacketCache.setRepeatData(contentPacket);
+//                // Switch start bit
+//                header[1] = (byte) (header[1] & 0x7F);
+//            }
+//        }
         duration = System.nanoTime() - oldTime;
     }
 

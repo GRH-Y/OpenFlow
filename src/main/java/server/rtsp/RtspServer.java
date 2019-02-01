@@ -5,10 +5,13 @@ import connect.network.nio.NioClientFactory;
 import connect.network.nio.NioServerTask;
 import server.rtsp.packet.RtcpPacket;
 import server.rtsp.packet.RtpPacket;
+import server.rtsp.rtp.RtpSocket;
 import util.LogDog;
 import util.NetUtils;
 
 import java.nio.channels.SocketChannel;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * RtspServer rtsp推流服务端
@@ -29,10 +32,15 @@ public class RtspServer extends NioServerTask {
     private RtcpPacket videoRtcpPacket;
     private RtcpPacket audioRtcpPacket;
 
+    private List<RtpSocket> videoSet;
+    private List<RtpSocket> audioSet;
+
     public RtspServer(int port) {
         String ip = NetUtils.getLocalIp("wlan0");
         setAddress(ip, port);
 
+        videoSet = new ArrayList<>();
+        audioSet = new ArrayList<>();
         videoRtpPacket = new RtpPacket();
         audioRtpPacket = new RtpPacket();
         videoRtpPacket.setClockFrequency(90000);
@@ -63,6 +71,14 @@ public class RtspServer extends NioServerTask {
 
     public RtcpPacket getAudioRtcpPacket() {
         return audioRtcpPacket;
+    }
+
+    public List<RtpSocket> getAudioSet() {
+        return audioSet;
+    }
+
+    public List<RtpSocket> getVideoSet() {
+        return videoSet;
     }
 
     @Override

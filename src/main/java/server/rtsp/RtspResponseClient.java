@@ -83,7 +83,6 @@ public class RtspResponseClient extends NioClientTask {
         getSender().sendData(data);
     }
 
-
     /**
      * 解析请求
      *
@@ -135,11 +134,11 @@ public class RtspResponseClient extends NioClientTask {
             audioSocket.startConnect();
 
             server.notifyStart();
-            dataSrc.addVideoSocket(videoSocket);
-            dataSrc.addAudioSocket(audioSocket);
-
-//            dataSrc.startAudioEncode();
-////            dataSrc.startVideoEncode();
+            if (server.getAudioSet().isEmpty() || server.getVideoSet().isEmpty()) {
+                dataSrc.setSteamOutSwitch(true);
+            }
+            server.getAudioSet().add(audioSocket);
+            server.getVideoSet().add(videoSocket);
 
             StringBuilder sb = new StringBuilder();
 //                long uptime = System.currentTimeMillis();
@@ -287,8 +286,11 @@ public class RtspResponseClient extends NioClientTask {
 
     @Override
     protected void onCloseSocketChannel() {
-        dataSrc.removeAudioSocket(audioSocket);
-        dataSrc.removeVideoSocket(videoSocket);
+        if (server.getAudioSet().isEmpty() && server.getVideoSet().isEmpty()) {
+            dataSrc.setSteamOutSwitch(false);
+        }
+        server.getAudioSet().remove(audioSocket);
+        server.getVideoSet().remove(videoSocket);
         if (audioSocket != null) {
             audioSocket.stopConnect();
         }
