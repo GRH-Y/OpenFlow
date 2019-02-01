@@ -6,9 +6,8 @@
     String path = "i:\\viode\\孤独的生还者.mp4";
     NioServerFactory factory = NioServerFactory.getFactory();
     RtspServer rtspServer = new RtspServer(554);
-    DataSrc dataSrc = new DataSrc(path);
+    Mp4DateSrc dataSrc = new Mp4DateSrc(rtspServer, path);
     dataSrc.initVideoEncode();
     dataSrc.initAudioEncode();
-    rtspServer.setDataSrc(dataSrc);
     factory.open();
     factory.addTask(rtspServer);
