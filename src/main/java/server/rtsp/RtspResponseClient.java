@@ -1,13 +1,10 @@
 package server.rtsp;
 
-import connect.network.nio.NioClientFactory;
-import connect.network.nio.NioClientTask;
-import connect.network.nio.NioReceive;
-import connect.network.nio.NioSender;
+import connect.network.nio.*;
+import log.LogDog;
 import server.rtsp.joggle.IDataSrc;
 import server.rtsp.protocol.RtspProtocol;
 import server.rtsp.rtp.RtpSocket;
-import util.LogDog;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -43,13 +40,12 @@ public class RtspResponseClient extends NioClientTask {
         super(socket);
         this.dataSrc = dataSrc;
         this.server = server;
-        setSender(new NioSender());
+        setSender(new NioHPCSender(this));
         setReceive(new NioReceive(this, "onReceiveData"));
     }
 
-
     @Override
-    protected void onConnectSocketChannel(boolean isConnect) {
+    protected void onConfigSocket(boolean isConnect, SocketChannel channel) {
         if (isConnect) {
             try {
                 InetSocketAddress remote = (InetSocketAddress) getSocketChannel().getRemoteAddress();
@@ -63,6 +59,7 @@ public class RtspResponseClient extends NioClientTask {
             }
         }
     }
+
 
     /**
      * 接受数据回调（设置setReceive 传进该方法名）
@@ -173,7 +170,7 @@ public class RtspResponseClient extends NioClientTask {
                     ";sprop-parameter-sets=" + dataSrc.getBase64SPS() + "," + dataSrc.getBase64PPS() + ";\r\n");
 //                sb.append("a=cliprect:0,0,160,240" + "\r\n");
 //                sb.append("a=framesize:97 240-160" + "\r\n");
-            sb.append("a=framerate:24.0" + "\r\n");
+            sb.append("a=framerate:30.0" + "\r\n");
             sb.append("a=control:trackID=" + 1 + "\r\n");
 
             response = RtspProtocol.responseDescribe(localAddress + ":" + localPort, request.seq, sb.toString());

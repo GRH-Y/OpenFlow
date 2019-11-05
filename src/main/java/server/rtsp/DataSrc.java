@@ -1,15 +1,16 @@
 package server.rtsp;
 
 
+import log.LogDog;
 import server.rtsp.joggle.IDataSrc;
 import server.rtsp.packet.NalPacket;
 import server.rtsp.packet.PacketType;
+import server.rtsp.packet.RtcpPacket;
 import server.rtsp.packet.RtpPacket;
 import server.rtsp.rtp.RtpSocket;
 import task.message.MessageCourier;
 import task.message.MessageEnvelope;
 import task.message.MessagePostOffice;
-import util.LogDog;
 
 import java.util.List;
 
@@ -27,6 +28,9 @@ public class DataSrc implements IDataSrc {
     private RtpPacket videoRtpPacket;
     private RtpPacket audioRtpPacket;
 
+    private RtcpPacket videoRtcpPacket;
+    private RtcpPacket audioRtcpPacket;
+
     protected List<RtpSocket> videoSet;
     protected List<RtpSocket> audioSet;
 
@@ -36,6 +40,8 @@ public class DataSrc implements IDataSrc {
         videoSet = server.getVideoSet();
         audioRtpPacket = server.getAudioRtpPacket();
         videoRtpPacket = server.getVideoRtpPacket();
+        videoRtcpPacket = server.getVideoRtcpPacket();
+        audioRtcpPacket = server.getAudioRtcpPacket();
 
         courier = new MessageCourier(this);
         postOffice = new MessagePostOffice();
@@ -143,12 +149,20 @@ public class DataSrc implements IDataSrc {
         courier.release();
     }
 
-    private void sendData(RtpPacket rtpPacket, List<RtpSocket> socketList) {
+    private void sendData(RtpPacket rtpPacket, RtcpPacket rtcpPacket, List<RtpSocket> socketList) {
         RtpSocket socket = socketList.get(0);
-        socket.sendRtpPacket(rtpPacket);
+        socket.sendRtpPacket(rtpPacket, rtcpPacket);
         for (int index = 1; index < socketList.size(); index++) {
             RtpSocket tmp = socketList.get(index);
-            tmp.sendRtpPacket(rtpPacket);
+//            if (tmp.isFirst()) {
+//                long oldTime = rtpPacket.getTimeStamp();
+//                rtpPacket.setTimeStamp(System.currentTimeMillis());
+//                tmp.sendRtpPacket(rtpPacket, rtcpPacket);
+//                rtpPacket.setTimeStamp(oldTime);
+//                tmp.setFirst(false);
+//            } else {
+                tmp.sendRtpPacket(rtpPacket, rtcpPacket);
+//            }
         }
     }
 
@@ -163,11 +177,11 @@ public class DataSrc implements IDataSrc {
             if (PacketType.AUDIO == packet.getPacketType()) {
 //                RtpPacket audioRtpPacket = server.getAudioRtpPacket();
                 audioRtpPacket.setNalPacket(packet);
-                sendData(audioRtpPacket, audioSet);
+                sendData(audioRtpPacket, audioRtcpPacket, audioSet);
             } else {
 //                RtpPacket videoRtpPacket = server.getVideoRtpPacket();
                 videoRtpPacket.setNalPacket(packet);
-                sendData(videoRtpPacket, videoSet);
+                sendData(videoRtpPacket, videoRtcpPacket, videoSet);
             }
             packet.setFullNal(false);
         } else {

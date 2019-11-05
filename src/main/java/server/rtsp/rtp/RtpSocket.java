@@ -4,6 +4,7 @@ package server.rtsp.rtp;
 import connect.network.udp.UdpClientTask;
 import connect.network.udp.UdpFactory;
 import connect.network.udp.UdpSender;
+import server.rtsp.packet.RtcpPacket;
 import server.rtsp.packet.RtpPacket;
 import server.rtsp.rtcp.RtcpReportSocket;
 
@@ -40,6 +41,7 @@ public class RtpSocket extends UdpClientTask {
         };
     }
 
+
     public void setPause(boolean pause) {
         isPause = pause;
     }
@@ -49,7 +51,7 @@ public class RtpSocket extends UdpClientTask {
         reportSocket.setAddress(reportSocket.getHost(), rtcpPort);
     }
 
-    public void sendRtpPacket(RtpPacket packet) {
+    public void sendRtpPacket(RtpPacket packet, RtcpPacket rtcpPacket) {
         if (!isPause) {
             UdpSender sender = getSender();
             //发送rtcp数据
@@ -57,6 +59,7 @@ public class RtpSocket extends UdpClientTask {
             //reportSocket.update(packet.getLimit(), (packet.getTime() + packet.getClockFrequency() / 25) / 10000L);
             //发送rtp数据
             //rtpSocket.putSendData(packet.getData(), packet.getLimit());//4-8
+//            reportSocket.sendRtcpData(rtcpPacket, packet.getLimit(), packet.getTimeStamp());//4-8
             sender.sendData(packet.getData(), packet.getLimit());
         }
     }
@@ -65,12 +68,12 @@ public class RtpSocket extends UdpClientTask {
     public void startConnect() {
         UdpFactory.getFactory().open();
         UdpFactory.getFactory().addTask(this);
-        reportSocket.startConnect();
+//        reportSocket.startConnect();
     }
 
     public void stopConnect() {
         UdpFactory.getFactory().removeTask(this);
-        reportSocket.stopConnect();
+//        reportSocket.stopConnect();
     }
 
 

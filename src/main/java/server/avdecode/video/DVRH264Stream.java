@@ -1,11 +1,11 @@
 package server.avdecode.video;
 
 
+import log.LogDog;
 import server.camera.H264Preview;
 import server.mp4.Mp4Analysis;
 import server.mp4.NalAnalysis;
 import server.rtsp.packet.RtpPacket;
-import util.LogDog;
 
 /**
  * 编码线程（把h264封装成RTP包）

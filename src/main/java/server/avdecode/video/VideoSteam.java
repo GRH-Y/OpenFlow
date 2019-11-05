@@ -6,7 +6,7 @@ import server.rtsp.packet.NalPacket;
 import server.rtsp.packet.OtherFramePacket;
 import server.rtsp.packet.RtpPacket;
 import task.executor.joggle.IConsumerAttribute;
-import util.IoUtils;
+import util.IoEnvoy;
 import util.MultiplexCache;
 
 import java.util.Base64;
@@ -82,7 +82,7 @@ public abstract class VideoSteam extends NalSteam {
      */
     protected void onFrameNalPacket(NalPacket nalPacket) {
         if (steamTrigger) {
-            IConsumerAttribute attribute = taskContainer.getAttribute();
+            IConsumerAttribute attribute = taskContainer.getTaskExecutor().getAttribute();
             attribute.pushToCache(nalPacket);
             resumeSteam();
         }
@@ -135,7 +135,6 @@ public abstract class VideoSteam extends NalSteam {
                 otherFramePacketCache.setRepeatData(otherFramePacket);
             }
         } else {
-
             // Large NAL unit => Split nal unit
             // Set FU-A header
             header[1] = (byte) (header[4] & 0x1F);  // FU header type
@@ -152,7 +151,7 @@ public abstract class VideoSteam extends NalSteam {
                     framePacketData[RtpPacket.RTP_HEADER_LENGTH] = header[0];
                     framePacketData[RtpPacket.RTP_HEADER_LENGTH + 1] = header[1];
                     int len = onSplitNal(framePacketData, nalLength, sum);
-                    if (len != IoUtils.FAIL) {
+                    if (len != IoEnvoy.FAIL) {
                         sum += len;
                         // Last keyFramePacket before next NAL
                         if (sum >= nalLength) {

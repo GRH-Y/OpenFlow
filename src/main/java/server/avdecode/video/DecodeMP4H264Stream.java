@@ -1,10 +1,10 @@
 package server.avdecode.video;
 
 
+import log.LogDog;
 import server.mp4.Mp4Box;
 import server.rtsp.packet.RtpPacket;
-import util.IoUtils;
-import util.LogDog;
+import util.IoEnvoy;
 import util.TypeConversion;
 
 import java.io.IOException;
@@ -76,58 +76,83 @@ public class DecodeMP4H264Stream extends VideoSteam {
         int fameIndex = 0;
         int stcoIndex = 0;
 
-        int cttsIndex = 0;
+        int cttsIndex = -1;
         int cttsCount = 0;
+
         try {
             Mp4Box.StscBox.Stsc stsc = stscList.get(fameIndex);
             Mp4Box.StscBox.Stsc nextStsc = null;
+            Mp4Box.CttsBox.Ctts ctts = null;
             if (stscList.size() > 1) {
                 nextStsc = stscList.get(1);
             }
-            Mp4Box.CttsBox.Ctts ctts = cttsList.get(cttsIndex);
-            cttsCount = ctts.sampleCount;
-            ts = System.nanoTime();
 
+//            ts = System.currentTimeMillis();
+            long test = 0;
             do {
                 if (nextStsc != null && stcoIndex + 1 == nextStsc.firstChunk) {
                     fameIndex++;
                     stsc = stscList.get(fameIndex);
                 }
 
-                if (cttsCount == 0) {
-                    cttsIndex++;
-                    if (cttsIndex < cttsList.size()) {
-                        ctts = cttsList.get(cttsIndex);
-                        cttsCount = ctts.sampleCount;
-                    }
-                }
                 file.seek(0);//恢复文件指针到0位置
                 int stco = stcoList.get(stcoIndex).sampleSize;
-                IoUtils.skip(file, stco);//定位到要读取的位置
+                IoEnvoy.skip(file, stco);//定位到要读取的位置
 
                 for (int index = 0; index < stsc.SamplesPerChunk; index++) {
                     if (!taskContainer.getTaskExecutor().getLoopState()) {
                         return;
                     }
-//                    oldTime = System.nanoTime();
-                    int len = IoUtils.readToFull(file, header);
-                    if (len == IoUtils.FAIL) {
+
+                    int len = IoEnvoy.readToFull(file, header);
+                    if (len == IoEnvoy.FAIL) {
                         return;
                     }
-                    long time = 30;
-                    if (ctts.sampleOffset > 0) {
-                        time = ctts.sampleOffset / 100;
-                        ts = System.nanoTime();
-                    }
+
+//                    if (cttsCount == 0) {
+//                        cttsIndex++;
+//                        if (cttsIndex < cttsList.size()) {
+//                            ctts = cttsList.get(cttsIndex);
+//                            cttsCount = ctts.sampleCount;
+//                        }
+//                        if (ctts.sampleOffset > 0) {
+//                            test += ctts.sampleOffset / 100;
+//                        }
+//                    }
+
+
+                    long time = 33;
+//                    if (ctts.sampleOffset == 0) {
+//                        time = ctts.sampleOffset;
+//                    } else
+//                    if (ctts.sampleOffset > 0) {
+//                        time = ctts.sampleOffset / 100;
+//                    }
+
+                    long now = System.currentTimeMillis();
                     taskContainer.getTaskExecutor().sleepTask(time);
-                    ts += ctts.sampleOffset;
-//                    ts += duration;
+                    if (oldTime == 0) {
+                        ts = now;
+                    } else if (oldTime > 0) {
+                        duration = 3000 + now - oldTime;
+//                        duration = 3000;
+                        ts += duration;
+//                        test = ts;
+                    }
+//                    if (ts == 0) {
+//                        ts = oldTime;
+//                    } else {
+//                        ts = 10000;
+//                    }
                     int nalLength = TypeConversion.byteToInt(header, 0);
                     type = header[4] & 0x1F;
-                    LogDog.v("==>DecodeMP4H264Stream type = " + type + " length = " + nalLength);
+                    LogDog.v("==>DecodeMP4H264Stream type = " + type + " length = " + nalLength + " ts = " + ts);
+                    //上一次时间戳 + 采样频率（典型值为90000）*0.000001 *  两帧时间差（单位毫秒）
                     execNalData(header, type, nalLength, ts);
 //                    duration = System.nanoTime() - oldTime;
-//                    duration += 3000;
+                    oldTime = now;
+//                    cttsCount--;
+//                    duration += 3600;
                 }
                 LogDog.i("======================================================");
                 stcoIndex++;
@@ -147,8 +172,8 @@ public class DecodeMP4H264Stream extends VideoSteam {
      * @param nalLength
      */
     protected void onSingleNal(byte[] framePacketData, int nalLength) {
-        int ret = IoUtils.readToFull(file, framePacketData, RtpPacket.RTP_HEADER_LENGTH + 1, nalLength);
-        if (ret == IoUtils.FAIL) {
+        int ret = IoEnvoy.readToFull(file, framePacketData, RtpPacket.RTP_HEADER_LENGTH + 1, nalLength);
+        if (ret == IoEnvoy.FAIL) {
             stopSteam();
         }
     }
@@ -158,8 +183,8 @@ public class DecodeMP4H264Stream extends VideoSteam {
      */
     protected int onSplitNal(byte[] framePacketData, int nalLength, int sum) {
         int len = nalLength - sum > nalMaxLength ? nalMaxLength : nalLength - sum;
-        int ret = IoUtils.readToFull(file, framePacketData, RtpPacket.RTP_HEADER_LENGTH + 2, len);
-        if (ret == IoUtils.FAIL) {
+        int ret = IoEnvoy.readToFull(file, framePacketData, RtpPacket.RTP_HEADER_LENGTH + 2, len);
+        if (ret == IoEnvoy.FAIL) {
             stopSteam();
         }
         return len;

@@ -1,21 +1,23 @@
 package server.avdecode;
 
+import log.LogDog;
 import server.rtsp.packet.NalPacket;
 import task.executor.BaseConsumerTask;
 import task.executor.ConsumerQueueAttribute;
 import task.executor.TaskContainer;
 import task.executor.joggle.IConsumerAttribute;
 import task.executor.joggle.IConsumerTaskExecutor;
+import task.executor.joggle.ILoopTaskExecutor;
+import task.executor.joggle.ITaskContainer;
 import task.message.MessageEnvelope;
 import task.message.joggle.IMsgPostOffice;
-import util.LogDog;
 
 /**
  * nal流
  */
 public abstract class NalSteam {
 
-    protected TaskContainer taskContainer;
+    protected ITaskContainer taskContainer;
     protected boolean steamTrigger = false;
     private String receiveMethodName = null;
     protected IMsgPostOffice msgPostOffice = null;
@@ -23,7 +25,7 @@ public abstract class NalSteam {
     public NalSteam() {
         SteamTask steamTask = new SteamTask();
         taskContainer = new TaskContainer(steamTask);
-        taskContainer.setAttribute(new ConsumerQueueAttribute<>());
+        taskContainer.getTaskExecutor().setAttribute(new ConsumerQueueAttribute<>());
     }
 
     public void setSteamOutSwitch(boolean trigger) {
@@ -63,8 +65,9 @@ public abstract class NalSteam {
 
     //=====================end 生命周期回调方法====================
 
-    private class SteamTask extends BaseConsumerTask<NalPacket> {
+    private class SteamTask extends BaseConsumerTask {
         private boolean initResult = false;
+        private ILoopTaskExecutor asyncExecutor = null;
 
         @Override
         protected void onInitTask() {
@@ -73,7 +76,7 @@ public abstract class NalSteam {
                 onSteamEndInit();
                 //开启异步线程处理发送数据
                 IConsumerTaskExecutor executor = taskContainer.getTaskExecutor();
-                executor.startAsyncProcessData();
+                asyncExecutor = executor.startAsyncProcessData();
             } else {
                 taskContainer.getTaskExecutor().stopTask();
             }
@@ -98,15 +101,18 @@ public abstract class NalSteam {
         @Override
         protected void onProcess() {
             if (initResult) {
-                IConsumerAttribute attribute = taskContainer.getAttribute();
+                IConsumerAttribute attribute = taskContainer.getTaskExecutor().getAttribute();
                 Object data = attribute.popCacheData();
+                if (data == null) {
+                    asyncExecutor.pauseTask();
+                }
                 sendData(data);
             }
         }
 
         @Override
         protected void onIdleStop() {
-            IConsumerAttribute attribute = taskContainer.getAttribute();
+            IConsumerAttribute attribute = taskContainer.getTaskExecutor().getAttribute();
             LogDog.w("==>SteamTask onIdleStop cache size = " + attribute.getCacheDataSize());
             Object data = attribute.popCacheData();
             while (data != null) {

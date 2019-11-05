@@ -3,12 +3,13 @@ package server.rtsp;
 
 import connect.network.nio.NioClientFactory;
 import connect.network.nio.NioServerTask;
+import log.LogDog;
 import server.rtsp.packet.RtcpPacket;
 import server.rtsp.packet.RtpPacket;
 import server.rtsp.rtp.RtpSocket;
-import util.LogDog;
 import util.NetUtils;
 
+import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
 import java.util.List;
@@ -86,14 +87,12 @@ public class RtspServer extends NioServerTask {
         connectNumber++;
         LogDog.w("==> RtspServer has client connect , client connect number = " + connectNumber);
         RtspResponseClient client = new RtspResponseClient(this, dataSrc, channel);
-        NioClientFactory factory = NioClientFactory.getFactory();
-        factory.open();
-        factory.addTask(client);
+        NioClientFactory.getFactory().open();
+        NioClientFactory.getFactory().addTask(client);
     }
 
-
     @Override
-    protected void onOpenServerChannel(boolean isSuccess) {
+    protected void onConfigServer(boolean isSuccess, ServerSocketChannel channel) {
         if (isSuccess) {
             LogDog.v("==> RtspServer running, server address = " + getServerHost());
             dataSrc.startVideoEncode();

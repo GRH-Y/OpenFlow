@@ -63,7 +63,7 @@ public class RtcpPacket {
         oldnow = now;
         if (interval > 0 && delta >= interval) {
             // We send a Sender Report
-            setRtcpData(System.currentTimeMillis(), rtpts);
+            setRtcpData(now, rtpts);
             delta = 0;
             return rtcpData;
         }
@@ -89,7 +89,8 @@ public class RtcpPacket {
      */
     private void setRtcpData(long ntpts, long rtpts) {
         long hb = ntpts / 1000000000;
-        long lb = ((ntpts - hb * 1000000000) * 4294967296L) / 1000000000;
+//        long lb = ((ntpts - hb * 1000000000) * 4294967296L) / 1000000000;
+        long lb = ntpts - hb;
         setLong(hb, 8, 12);
         setLong(lb, 12, 16);
         setLong(rtpts, 16, 20);

@@ -1,7 +1,7 @@
 package server.camera;
 
 
-import util.LogDog;
+import log.LogDog;
 
 /**
  * Created by dell on 11/13/2017.

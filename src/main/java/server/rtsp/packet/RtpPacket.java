@@ -16,6 +16,7 @@ public class RtpPacket {
     private int limit = 0;
     private int seq = 0;
     private int ssrc = new Random().nextInt();
+    private long timeStamp = 0;
     private boolean isFullNal = false;
 
     private PacketType packetType = PacketType.VIDEO;
@@ -47,21 +48,28 @@ public class RtpPacket {
         //1-2
         data[0] = (byte) 0x80;
         data[1] = (byte) 96 & 0x7F;
+
+        isFullNal = packet.isFullNal();
         if (isFullNal) {
             //设置最后的包标记
             data[1] |= 0x80;
         }
         //2-4
         setLong(data, ++seq, 2, 4);
-        isFullNal = packet.isFullNal();
+
         //4-8
-        setLong(data, packet.getTime() / 10000L, 4, 8);
+        timeStamp = packet.getTime();
+        //timeStamp / 10000L
+        setLong(data, timeStamp, 4, 8);
 //        setLong(data, (timestamp / 100L) * (clock / 1000L) / 10000L, 4, 8);
 //        setLong(data, (timestamp + clock / 30) / 10000L, 4, 8);
         //8-12
         setLong(data, ssrc, 8, 12);
     }
 
+    public long getTimeStamp() {
+        return timeStamp;
+    }
 
     public int getSSRC() {
         return ssrc;
