@@ -1,8 +1,9 @@
 out/
 .git/
 .idea/
+build/
 .gradle/
 classes/
-resources/
-OpenFlowTestMain.java
-Mp4DateSrc.java
+resources/voide/
+src/test/
+OpenFlowTestMain
